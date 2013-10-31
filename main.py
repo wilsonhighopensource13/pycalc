@@ -21,33 +21,31 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
     return table_of_values
 
 def val_function(expression, x):
-    try: eval(expression)
-    except: "DNE"
+    try: 
+        return eval(expression)
+    except: 
+        return "DNE"
 
-def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
+def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work, will find all points of a function
     table_of_values = []
-    storage_float = 0
-    storage_string = ""
-    try: #may fail if either lower_bound, upper_bound, or delta_x are floats
-        for numbers in range(lower_bound,upper_bound+1, delta_x):
-            try: storage = round(val_function(expression, number),4)
-            except: storage = val_function(expression, number)
-            table_of_values.append([numbers, storage])
-    except:#will run an advanced list-making tool
-        x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
-        for number in x_val_list:
-            try: storage = round(val_function(expression, number),4)
-            except: val_function(expression, number)
-            table_of_values.append([number, storage]) 
-    return table_of_values
+    storage = None
+    x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
+    for number in x_val_list:
+        try: 
+            print(val_function(expression,number))
+        if isinstance(val_function(expression,number),float):
+            storage = round(val_function(expression, number),4)
+        if isinstance(val_function(expression,number),int) == int:
+            storage = val_function(expression, number)        
+        table_of_values.append([number, storage]) 
 
 def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figuring a table of values for a function
     i = 0
-    tableau_of_inputs=[]
+    table_of_inputs=[]
     while i < math.floor((upper_bound - lower_bound)/delta_x):
         intermediate_x = lower_bound + i*delta_x
-        tableau_of_inputs.append(intermediate_x)
+        table_of_inputs.append(intermediate_x)
         i = i+1
-    return tableau_of_inputs
+    return table_of_inputs
 
-print (table_function_points("1/(x)", -10, 10, .25))
+            
