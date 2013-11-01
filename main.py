@@ -1,5 +1,9 @@
 import math
 
+def find_terms(expression):
+    #finds the terms in an expression and puts them into a list, to be used to create a derivative of a function at all points
+    pass
+
 def nDeriv(expression, x, h):
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
 :uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
