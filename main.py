@@ -7,7 +7,9 @@ def replace_english(expression):
 def find_terms(expression):
     #finds the terms in an expression and puts them into a list, to be used to 
     #create a derivative of a function at all points
-    operator_list = ["+","-","/","*","^"]
+    diff_operator_list = ["+","-"] #operators which divides it into terms
+    same_operator_list = ["*","/"] #operators within terms
+    pass
     
 
 def nDeriv(expression, x, h):
