@@ -1,12 +1,18 @@
 import math
 
+def replace_english(expression):
+    expression.replace("^","**")
+    return expression
+
 def find_terms(expression):
-    #finds the terms in an expression and puts them into a list, to be used to create a derivative of a function at all points
-    pass
+    #finds the terms in an expression and puts them into a list, to be used to 
+    #create a derivative of a function at all points
+    operator_list = ["+","-","/","*","^"]
+    
 
 def nDeriv(expression, x, h):
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
-:uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
+    :uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
     try:
         deriv_expression_a = expression.replace("x", "(x+h)")
         deriv_expression_b = expression.replace("x", "(x-h)")
@@ -36,11 +42,12 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
 
 def val_function(expression, x):
     try:
-        eval(expression)
+        return eval(expression)
     except:
-        "DNE"
+        return "DNE"
 
 def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
+    expression = replace_english()
     table_of_values = []
     storage_float = 0
     storage_string = ""
@@ -66,4 +73,4 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
 
-print (table_function_points("1/(x)", -10, 10, .25))
+print (table_function_points("x^2", -10, 10, .25))
