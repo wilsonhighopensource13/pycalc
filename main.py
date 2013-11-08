@@ -2,7 +2,12 @@ import math
 from types import *
 
 def replace_english(expression):
-    expression.replace("**","^")
+    replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
+                          ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"]]
+    for replacements in replacement_tables:
+        old = replacements[0]
+        new = replacements[1]
+        expression = expression.replace(old,new)
     return expression
 
 def find_terms(expression):
@@ -24,7 +29,8 @@ def nDeriv(expression, x, h):
         solution = "DNE"
     return solution
 
-def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivative (on the increment delta_x) in domain: [lowerbound,upperbound]
+def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
+    #(on the increment delta_x) in domain: [lowerbound,upperbound]
     table_of_values = []
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
@@ -44,15 +50,14 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
     return table_of_values
 
 def val_function(expression, x):
-    print (eval(expression))
     try:
-        print (eval(expression))
+        return (eval(expression))
     except:
         return "DNE"
 
 def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
     expression = replace_english(expression)
-    print expression
+    print (expression)
     table_of_values = []
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
@@ -75,10 +80,12 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
     i = 0
     table_of_inputs=[]
     while i < math.floor((upper_bound - lower_bound)/delta_x):
-        intermediate_x = lower_bound + i*delta_x
+        try:
+            intermediate_x = round((lower_bound + i*delta_x), 4)
+        except:
+            intermediate_x = lower_bound + i*delta_x
         table_of_inputs.append(intermediate_x)
         i = i+1
     return table_of_inputs
 
-print (table_function_points("x^2",-10,10,.5))
-       
+print(table_function_points("[[x]]",0,10,.1))
