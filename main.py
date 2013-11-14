@@ -11,11 +11,11 @@ def replace_english(expression):
     return expression
 
 def find_terms(expression):
-    #finds the terms in an expression and puts them into a list, to be used to
-    #create a derivative of a function at all points
-    diff_operator_list = ["+","-"] #operators which divides it into terms
-    same_operator_list = ["*","/"] #operators within terms
-    pass
+    infix_operation_indices = ["+","-","*","**","/"]
+    prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
+    postfix_operation_indices = [")"]
+    for char in expression:
+        pass
     
 
 def nDeriv(expression, x, h):
