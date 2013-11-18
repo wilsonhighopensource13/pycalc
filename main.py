@@ -11,12 +11,15 @@ def replace_english(expression):
     return expression
 
 def find_terms(expression):
-    infix_operation_indices = ["+","-","*","**","/"]
+    infix_operation_indices = ["+","-","*","/"] ##items which will separate terms
     prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
     postfix_operation_indices = [")"]
-    for char in expression:
-        pass
-    
+    infix_location = []
+    i = 0
+    while i < len(expression):
+        char = expression[i]
+        if char == infix_operation_indices:
+            infix_location.append(char)
 
 def nDeriv(expression, x, h):
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
