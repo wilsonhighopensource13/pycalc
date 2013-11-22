@@ -3,7 +3,8 @@ from types import *
 
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
-                          ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"]]
+                          ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],
+                          ["]]",")"]]
     for replacements in replacement_tables:
         old = replacements[0]
         new = replacements[1]
@@ -32,23 +33,24 @@ def nDeriv(expression, x, h):
         solution = "DNE"
     return solution
 
-def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
-    #(on the increment delta_x) in domain: [lowerbound,upperbound]
+def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
+    expression = replace_english(expression)
+    print (expression)
     table_of_values = []
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
             try:
-                storage= round(nDeriv(expression, numbers, .0001),4)
+                storage = round(nDeriv(expression, number),4)
             except:
-                storage = nDeriv(expression, numbers, .0001)
+                storage = nDeriv(expression, number)
             table_of_values.append([numbers, storage])
     except:#will run an advanced list-making tool
         x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
         for number in x_val_list:
             try:
-                storage = round(nDeriv(expression, number, .0001),4)
+                storage = round(nDeriv(expression,number),4)
             except:
-                storage = nDeriv(expression, number, .0001)
+                storage = nDeriv(expression, number)
             table_of_values.append([number, storage])
     return table_of_values
 
