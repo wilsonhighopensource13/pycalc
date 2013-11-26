@@ -1,10 +1,9 @@
-import math
+import math, matplotlib.pyplot as plt
 from types import *
 
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
-                          ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],
-                          ["]]",")"]]
+                          ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"]]
     for replacements in replacement_tables:
         old = replacements[0]
         new = replacements[1]
@@ -30,27 +29,26 @@ def nDeriv(expression, x, h):
         deriv_expression_b = expression.replace("x", "(x-h)")
         solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2*h)
     except:
-        solution = "DNE"
+        solution = 0
     return solution
 
-def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
-    expression = replace_english(expression)
-    print (expression)
+def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
+    #(on the increment delta_x) in domain: [lowerbound,upperbound]
     table_of_values = []
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
             try:
-                storage = round(nDeriv(expression, number),4)
+                storage= round(nDeriv(expression, numbers, .0001),4)
             except:
-                storage = nDeriv(expression, number)
+                storage = nDeriv(expression, numbers, .0001)
             table_of_values.append([numbers, storage])
     except:#will run an advanced list-making tool
         x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
         for number in x_val_list:
             try:
-                storage = round(nDeriv(expression,number),4)
+                storage = round(nDeriv(expression, number, .0001),4)
             except:
-                storage = nDeriv(expression, number)
+                storage = nDeriv(expression, number, .0001)
             table_of_values.append([number, storage])
     return table_of_values
 
@@ -58,7 +56,7 @@ def val_function(expression, x):
     try:
         return (eval(expression))
     except:
-        return "DNE"
+        return None
 
 def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
     expression = replace_english(expression)
@@ -80,7 +78,25 @@ def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requ
                 storage = val_function(expression, number)
             table_of_values.append([number, storage])
     return table_of_values
-
+    
+def graph(expression,Type,lower_bound, upper_bound, delta_x):
+    x_values = []
+    y_values = []
+    if Type == "deriv":
+        table_of_values = table_deriv_points(expression,lower_bound, upper_bound,delta_x)
+        for elements in table_of_values:
+            x_values.append(elements[0])
+            y_values.append(elements[1])
+        plt.plot(x_values, y_values)
+        plt.show()
+    elif Type == "function":
+        table_of_values = table_function_points(expression,lower_bound,upper_bound,delta_x)
+        for elements in table_of_values:
+            x_values.append(elements[0])
+            y_values.append(elements[1])
+        plt.plot(x_values, y_values)
+        plt.show()
+        
 def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figuring a table of values for a function
     i = 0
     table_of_inputs=[]
@@ -93,4 +109,5 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
 
-print(table_function_points("[[x]]",0,10,.1))
+graph("x**2","deriv",-10,10,.1)
+graph("x**2","function",-10,10,.1)
