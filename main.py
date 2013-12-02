@@ -1,5 +1,5 @@
 import math
-from types import *
+import matplotlib.pyplot as plt
 
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
@@ -64,6 +64,8 @@ def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requ
     expression = replace_english(expression)
     print (expression)
     table_of_values = []
+    xs  = []
+    ys = []
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
             try:
@@ -79,7 +81,18 @@ def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requ
             except:
                 storage = val_function(expression, number)
             table_of_values.append([number, storage])
-    return table_of_values
+    for elements in table_of_values:
+        xs.append(elements[0])
+        ys.append(elements[1])
+    return xs, ys
+
+def graph(expression, lower_bound, upper_bound, delta_x):
+    x_values, y_values = table_function_points(expression, lower_bound, upper_bound, delta_x)
+    for y in y_values:
+        if y == "DNE":
+            y = None
+    plt.plot(x_values,y_values)
+    plt.show()
 
 def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figuring a table of values for a function
     i = 0
@@ -92,5 +105,3 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         table_of_inputs.append(intermediate_x)
         i = i+1
     return table_of_inputs
-
-print(table_function_points("[[x]]",0,10,.1))
