@@ -11,11 +11,20 @@ def replace_english(expression):
     return expression
 
 def find_terms(expression):
+    log_signs_locations = {}
     infix_operation_indices = ["+","-","*","**","/"]
-    prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
-    postfix_operation_indices = [")"]
-    for char in expression:
-        pass
+    #prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
+    #postfix_operation_indices = [")"]
+    i = 0
+    indicator = 0
+    while i < len(expression):
+        for indices in infix_operation_indices:
+            if expression[i] == indices:
+                indicator += 1
+                log_signs_locations[indices] = [log_signs_locations[indices]].append(i)
+            
+    return log_signs_locations
+            #if char == infix_operation_indices[0] 
     
 
 def nDeriv(expression, x, h):
@@ -35,7 +44,7 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
             try:
-                storage= round(nDeriv(expression, numbers, .0001),4)
+                storage= round(nDeriv(expression, numbers, .0001,4))
             except:
                 storage = nDeriv(expression, numbers, .0001)
             table_of_values.append([numbers, storage])
@@ -43,7 +52,7 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
         x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
         for number in x_val_list:
             try:
-                storage = round(nDeriv(expression, number, .0001),4)
+                storage = round(nDeriv(expression, number, .0001,4))
             except:
                 storage = nDeriv(expression, number, .0001)
             table_of_values.append([number, storage])
@@ -88,4 +97,4 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
 
-print(table_function_points("[[x]]",0,10,.1))
+print(table_deriv_points("",lower,upper,))
