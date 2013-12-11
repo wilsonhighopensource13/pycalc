@@ -121,7 +121,10 @@ def graph(expression,graph_type,lower_bound, upper_bound, delta_x,y_lower_lim,y_
     ax.set_xlim(lower_bound,upper_bound)
     plt.vlines(0, -1000,1000)
     plt.hlines(0, -1000,1000)
-    function = "f(x)=%s"%expression
+    if graph_type == "deriv":
+        function = "d/dx%s"%expression
+    elif graph_type == "function":
+        function = "f(x)=%s"%expression
     plt.legend(p1,[function])
     plt.show()
     return 0
