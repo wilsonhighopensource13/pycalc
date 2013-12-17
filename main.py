@@ -4,10 +4,16 @@ def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
                           ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"],
                           ["arccos(","math.acos("],["sqrt(","math.sqrt("]]
+    variable = "x"
+    digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     for replacements in replacement_tables:
         old = replacements[0]
         new = replacements[1]
         expression = expression.replace(old,new)
+    for i in range(0,len(expression)-1):
+        if expression[i] in digits or expression[i] == variable and expression[i+1] in digits or expression[i+i] == variable:
+            print(i)
+            #put a multiplication symbol between a constant and a variable 
     return expression
 
 def find_terms(expression):
@@ -42,7 +48,7 @@ def nDeriv(expression, x, h):
         deriv_expression_a = expression.replace("x", "(x+h)")
         deriv_expression_b = expression.replace("x", "(x-h)")
         solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2*h)
-        if solution == 100000000:
+        if solution >= 100000000:
             solution = None
     except:
         solution = None
@@ -66,6 +72,8 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
                 storage = round(nDeriv(expression, number, .0000001,4))
             except:
                 storage = nDeriv(expression, number, .0001)
+            if expression.find("math.floor") or expression.find("floor") and storage > 0:
+                storage = None
             table_of_values.append([number, storage])
     xs = []
     ys = []
@@ -122,7 +130,7 @@ def graph(expression,graph_type,lower_bound, upper_bound, delta_x,y_lower_lim,y_
     plt.vlines(0, -1000,1000)
     plt.hlines(0, -1000,1000)
     if graph_type == "deriv":
-        function = "d/dx%s"%expression
+        function = "(d/dx)%s"%expression
     elif graph_type == "function":
         function = "f(x)=%s"%expression
     plt.legend(p1,[function])
@@ -142,4 +150,4 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
     
-graph("1/(2*sqrt(x))","deriv",-10,10,.1,-10,10)
+graph("x**x/10*x","function",-10,10,.01,-10,10)
