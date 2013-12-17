@@ -8,11 +8,11 @@ def replace_english(expression):
     digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     for replacements in replacement_tables:
         old = replacements[0]
-        new = replacements[1]
+        new = replacements[1] 
         expression = expression.replace(old,new)
     for i in range(0,len(expression)-1):
-        if (expression[i] in digits or expression[i] == variable) and (expression[i+1] in digits or expression[i+1] == variable):
-	   expression.join([expression[0:i], "*", expression[i:]])
+        if (expression[i] in digits or expression[i] == variable) and (expression[i+1] == variable):
+	   expression = expression.join([expression[0:i],"*",expression[i+1:-1]])
     return expression
 
 def find_terms(expression):
