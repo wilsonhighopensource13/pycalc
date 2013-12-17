@@ -11,9 +11,8 @@ def replace_english(expression):
         new = replacements[1]
         expression = expression.replace(old,new)
     for i in range(0,len(expression)-1):
-        if expression[i] in digits or expression[i] == variable and expression[i+1] in digits or expression[i+i] == variable:
-            print(i)
-            #put a multiplication symbol between a constant and a variable 
+        if (expression[i] in digits or expression[i] == variable) and (expression[i+1] in digits or expression[i+1] == variable):
+	   expression.join([expression[0:i], "*", expression[i:]])
     return expression
 
 def find_terms(expression):
@@ -150,4 +149,4 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
     
-graph("x**x/10*x","function",-10,10,.01,-10,10)
+graph("10x","function",-10,10,.01,-10,10)
