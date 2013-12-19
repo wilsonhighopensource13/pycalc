@@ -11,8 +11,10 @@ def replace_english(expression):
         new = replacements[1] 
         expression = expression.replace(old,new)
     for i in range(0,len(expression)-1):
-        if (expression[i] in digits or expression[i] == variable) and (expression[i+1] == variable):
-	   expression = expression.join([expression[0:i],"*",expression[i+1:-1]])
+        if (expression[i] in digits) and (expression[i+1] == variable):
+            a, b =(expression[0:i+1],expression[i+1:])
+            expression = ""
+            expression = expression.join([a,"*",b])
     return expression
 
 def find_terms(expression):
@@ -47,6 +49,8 @@ def nDeriv(expression, x, h):
         deriv_expression_a = expression.replace("x", "(x+h)")
         deriv_expression_b = expression.replace("x", "(x-h)")
         solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2*h)
+        if (expression.find("math.floor") or expression.find("floor")) and solution>0:
+            solution =  None
         if solution >= 100000000:
             solution = None
     except:
@@ -56,6 +60,7 @@ def nDeriv(expression, x, h):
 def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
     #(on the increment delta_x) in domain: [lowerbound,upperbound]
     expression = replace_english(expression)
+    print (expression)
     table_of_values = []
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
@@ -71,8 +76,6 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
                 storage = round(nDeriv(expression, number, .0000001,4))
             except:
                 storage = nDeriv(expression, number, .0001)
-            if expression.find("math.floor") or expression.find("floor") and storage > 0:
-                storage = None
             table_of_values.append([number, storage])
     xs = []
     ys = []
@@ -95,12 +98,12 @@ def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requ
     xs  = []
     ys = []
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
-        for numbers in range(lower_bound,upper_bound+1, delta_x):
+        for number in range(lower_bound,upper_bound+1, delta_x):
             try:
                 storage = round(val_function(expression, number),4)
             except:
                 storage = val_function(expression, number)
-            table_of_values.append([numbers, storage])
+            table_of_values.append([number, storage])
     except:#will run an advanced list-making tool
         x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
         for number in x_val_list:
@@ -118,7 +121,7 @@ def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requ
 def graph(expression,graph_type,lower_bound, upper_bound, delta_x,y_lower_lim,y_upper_lim):
     x_values = []
     y_values = []
-    if graph_type == "deriv":
+    if graph_type == "derivative":
         x_values, y_values = table_deriv_points(expression,lower_bound,upper_bound,delta_x)
     elif graph_type == "function":
         x_values, y_values = table_function_points(expression,lower_bound,upper_bound,delta_x)
@@ -128,7 +131,7 @@ def graph(expression,graph_type,lower_bound, upper_bound, delta_x,y_lower_lim,y_
     ax.set_xlim(lower_bound,upper_bound)
     plt.vlines(0, -1000,1000)
     plt.hlines(0, -1000,1000)
-    if graph_type == "deriv":
+    if graph_type == "derivative":
         function = "(d/dx)%s"%expression
     elif graph_type == "function":
         function = "f(x)=%s"%expression
@@ -149,4 +152,4 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
     
-graph("10x","function",-10,10,.01,-10,10)
+graph("[[x]]","function",-10,10,.01,-10,10)
