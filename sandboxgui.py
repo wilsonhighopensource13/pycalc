@@ -1,6 +1,18 @@
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
-from Tkinter import *
+from tkinter import *
+
+def backspace():
+    event.widget.delete("%s-1c" % INSERT, INSERT)
+def button_handler(button_name):
+    if button_name == "delete":
+        pass
+    elif button_name == "plus":
+        clibox.insert(END, "+")
+    elif button_name == "minus":
+        clibox.insert(END, "-")
+def issue_command(command):
+    pass
 i = 0
 root = Tk()
     
@@ -9,6 +21,8 @@ frame.config(bg="#000000")
 clibox = Text(frame)
 clibox.grid(row=0,column=0, rowspan=5, columnspan=5)
 clibox.config(bg="#000000", fg="#FFFFFF")
+clibox.insert(END, ">>>")
+clibox.mark_set("sentinel", INSERT)
 y_equals = Button(frame, text="Y=")
 y_equals.grid(row=5,column=0, sticky=N+E+S+W)
 y_equals.config(bg="#3cb879",fg="#000000")
@@ -131,8 +145,8 @@ mode_button.config(bg="#006fae", fg="#FFFFFF")
 power_button.config(bg="#006fae", fg="#FFFFFF")
 
 #initialize four-function elements
-minus_button = Button(frame, text="-")
-plus_button = Button(frame, text="+")
+minus_button = Button(frame, text="-", command=button_handler("minus"))
+plus_button = Button(frame, text="+", command=button_handler("plus"))
 division_button = Button(frame, text="/")
 multiplication_button = Button(frame, text="*")
 enter_button = Button(frame, text="ENTER\n↵")
@@ -153,5 +167,4 @@ multiplication_button.config(bg="#524741", fg="#FFFFFF")
 division_button.config(bg="#524741", fg="#FFFFFF")
 
 frame.pack()
-
 root.mainloop()
