@@ -117,7 +117,6 @@ def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requ
         ys.append(elements[1])
     return xs, ys
 
-  
 def graph(expression,graph_type,lower_bound, upper_bound, delta_x,y_lower_lim,y_upper_lim):
     x_values = []
     y_values = []
@@ -152,4 +151,4 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
     
-graph("[[x]]","function",-10,10,.01,-10,10)
+graph("x**2",-10,10,.001,-10,10)
