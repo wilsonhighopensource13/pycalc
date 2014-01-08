@@ -1,19 +1,49 @@
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
 from tkinter import *
-
+import webbrowser
+helper = """\n
+graph_deriv(y=<algebraic expression>)\t graphs the derivative of the function
+graph(y=<algebraic expression>)\t graphs the function
+let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an\n\t expression
+>>>
+"""
+i = 0
+sec_status = False
 def backspace():
     event.widget.delete("%s-1c" % INSERT, INSERT)
-def button_handler(button_name):
-    if button_name == "delete":
-        pass
-    elif button_name == "plus":
-        clibox.insert(END, "+")
-    elif button_name == "minus":
-        clibox.insert(END, "-")
+def plus_handler():
+    clibox.insert(END, "+")
 def issue_command(command):
     pass
-i = 0
+def minus_handler():
+    clibox.insert(END, "-")
+def multiply_handler():
+    clibox.insert(END, "*")
+def divide_handler():
+    clibox.insert(END, "/")
+def equals_handler():
+    clibox.insert(END, "=")
+def handle_log():
+    if sec_status == False:
+        clibox.insert(END, "ln(")
+    elif sec_status == True:
+        clibox.insert(END, "log(")
+def handle_exponential():
+    if sec_status == False:
+        clibox.insert(END, "e^(")
+    elif sec_status == True:
+        clibox.insert(END, "10^(")
+def handle_power():
+    if sec_status == False:
+        clibox.insert(END, "^")
+    if sec_status == True:
+        clibox.insert(END, "sqrt(")
+def handle_help():
+    if sec_status == False:
+        clibox.insert(END, helper)
+    elif sec_status == True:
+        webbrowser.open(url="http://www.duckduckgo.com/")
 root = Tk()
     
 frame = Frame(root)
@@ -103,15 +133,15 @@ zero.config(bg="#0a4a92", fg="#FFFFFF")
 negative.config(bg="#0a4a92", fg="#FFFFFF")
                 
 #intitalize function pad row 1
-help_button = Button(frame, text="HELP")
-function2 = Button(frame, text=" ")
-function3 = Button(frame, text=" ")
+help_button = Button(frame, text="gui-help\nCLI-HELP", command=handle_help)
+function2 = Button(frame, text="(")
+function3 = Button(frame, text=")")
 function4 = Button(frame, text=" ")
 #row 2
-logORln_button = Button(frame, text="log\nLN")
-exponential_button=Button(frame,text="10^x\ne^x")
-power_button=Button(frame,text="sqrt\nX^Y")
-function5 = Button(frame, text="CLEAR")
+logORln_button = Button(frame, text="log\nLN", command=handle_log)
+exponential_button=Button(frame,text="10^x\ne^x", command=handle_exponential)
+power_button=Button(frame,text="sqrt\nX^Y", command=handle_power)
+function5 = Button(frame, text="CLEAR")#, command=clear_line)
 #row 3
 function6 = Button(frame, text="Ins\nDEL")
 program_button = Button(frame, text="PRGM")
@@ -145,12 +175,12 @@ mode_button.config(bg="#006fae", fg="#FFFFFF")
 power_button.config(bg="#006fae", fg="#FFFFFF")
 
 #initialize four-function elements
-minus_button = Button(frame, text="-", command=button_handler("minus"))
-plus_button = Button(frame, text="+", command=button_handler("plus"))
-division_button = Button(frame, text="/")
-multiplication_button = Button(frame, text="*")
+minus_button = Button(frame, text="-", command=minus_handler)
+plus_button = Button(frame, text="+", command=plus_handler)
+division_button = Button(frame, text="/", command=divide_handler)
+multiplication_button = Button(frame, text="*", command=multiply_handler)
 enter_button = Button(frame, text="ENTER\n↵")
-equals_button = Button(frame,text="=")
+equals_button = Button(frame,text="=", command=equals_handler)
 #grid four-function elements
 enter_button.grid(row=4,column=9,columnspan=3,sticky=N+E+S+W)
 plus_button.grid(row=5,column=9,sticky=N+E+S+W)
