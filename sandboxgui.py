@@ -13,8 +13,7 @@ let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an
 """
 i = 0
 sec_status = False
-def backspace():
-    event.widget.delete("%s-1c" % INSERT, INSERT)
+
 def plus_handler():
     clibox.insert(END, "+")
 def issue_command(command):
@@ -47,8 +46,34 @@ def handle_help():
         clibox.insert(END, helper)
     elif sec_status == True:
         webbrowser.open(url="http://www.duckduckgo.com/")
-root = Tk()
+        global sec_status
+        sec_status = False
+def second_handler():
+    if sec_status == True:
+        global sec_status
+        sec_status = False
+        print(False)
+    elif sec_status == False:
+        global sec_status
+        sec_status = True
+        print(True)
+def handle_del():
+    if sec_status == False:
+        pass
+    elif sec_status == True:
+        pass
+def y_handler():
+    clibox.insert(END, "Y=")
+def graph_handler():
+    clibox.insert(END, "graph(")
+def deriv_handler():
+    clibox.insert(END, "gderiv(")
+def handle_nderiv():
+    clibox.insert(END, "nderiv(")
+
     
+root = Tk()
+root.wm_title("nTERM-Calc")
 frame = Frame(root)
 frame.config(bg="#000000")
 clibox = Text(frame)
@@ -56,7 +81,10 @@ clibox.grid(row=0,column=0, rowspan=5, columnspan=5)
 clibox.config(bg="#000000", fg="#FFFFFF")
 clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
-y_equals = Button(frame, text="Y=")
+clibox.pack(side="top", fill="both", expand=True)
+clibox.tag_configure("current_line", background="#e9e9e9")
+highlight(100)
+y_equals = Button(frame, text="Y=",command=y_handler)
 y_equals.grid(row=5,column=0, sticky=N+E+S+W)
 y_equals.config(bg="#3cb879",fg="#000000")
 graph_button = Button(frame, text="Graph")
@@ -74,7 +102,7 @@ deriv_button.config(bg="#fef200",fg="#000000")
 about_text = Message(frame, text="Graphing Calculator\nPowered by Python 3.3",width=300)
 about_text.grid(row=6, column=0, columnspan=5, sticky=N+E+S+W)
 about_text.config(anchor=W, bg="#000000",fg="#FFFFFF")
-second_button = Button(frame, text="2nd")
+second_button = Button(frame, text="2nd", command=second_handler)
 second_button.grid(row=0, column=5, sticky=N+E+S+W)
 second_button.config(bg="#10186d", fg="#FFFFFF")
 sin_button = Button(frame, text="sin")
@@ -139,15 +167,15 @@ negative.config(bg="#0a4a92", fg="#FFFFFF")
 help_button = Button(frame, text="gui-help\nCLI-HELP", command=handle_help)
 function2 = Button(frame, text="(")
 function3 = Button(frame, text=")")
-function4 = Button(frame, text=" ")
+function4 = Button(frame, text="nDeriv(", command=handle_nderiv)
 #row 2
 logORln_button = Button(frame, text="log\nLN", command=handle_log)
 exponential_button=Button(frame,text="10^x\ne^x", command=handle_exponential)
 power_button=Button(frame,text="sqrt\nX^Y", command=handle_power)
 function5 = Button(frame, text="CLEAR")#, command=clear_line)
 #row 3
-function6 = Button(frame, text="Ins\nDEL")
-program_button = Button(frame, text="PRGM")
+function6 = Button(frame, text="Ins\nDEL", command=handle_del)
+program_button = Button(frame, text="PRGM", state=DISABLED)
 x_var_button = Button(frame, text="vars\nX")
 mode_button = Button(frame, text="MODE")
 #grid function pad elements
@@ -198,6 +226,9 @@ minus_button.config(bg="#524741", fg="#FFFFFF")
 equals_button.config(bg="#524741", fg="#FFFFFF")
 multiplication_button.config(bg="#524741", fg="#FFFFFF")
 division_button.config(bg="#524741", fg="#FFFFFF")
-
+def highlight(interval=100):
+    clibox.tag_remove("current_line", 1.0, "end")
+    clibox.tag_add("current_line", "insert lineend", "insert lineend+1c")
+    root.after(interval,highlight)
 frame.pack()
 root.mainloop()
