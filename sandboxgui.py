@@ -4,7 +4,7 @@ try:
     from tkinter import *
 except:
     from Tkinter import *
-import webbrowser
+import webbrowser, os
 helper = """\n
 graph_deriv(y=<algebraic expression>)\t graphs the derivative of the function
 graph(y=<algebraic expression>)\t graphs the function
@@ -15,35 +15,35 @@ i = 0
 sec_status = False
 
 def plus_handler():
-    clibox.insert(END, "+")
+    clibox.insert(INSERT, "+")
 def issue_command(command):
     pass
 def minus_handler():
-    clibox.insert(END, "-")
+    clibox.insert(INSERT, "-")
 def multiply_handler():
-    clibox.insert(END, "*")
+    clibox.insert(INSERT, "*")
 def divide_handler():
-    clibox.insert(END, "/")
+    clibox.insert(INSERT, "/")
 def equals_handler():
-    clibox.insert(END, "=")
+    clibox.insert(INSERT, "=")
 def handle_log():
     if sec_status == False:
-        clibox.insert(END, "ln(")
+        clibox.insert(INSERT, "ln(")
     elif sec_status == True:
-        clibox.insert(END, "log(")
+        clibox.insert(INSERT, "log(")
 def handle_exponential():
     if sec_status == False:
-        clibox.insert(END, "e^(")
+        clibox.insert(INSERT, "e^(")
     elif sec_status == True:
-        clibox.insert(END, "10^(")
+        clibox.insert(INSERT, "10^(")
 def handle_power():
     if sec_status == False:
-        clibox.insert(END, "^")
+        clibox.insert(INSERT, "^")
     if sec_status == True:
-        clibox.insert(END, "sqrt(")
+        clibox.insert(INSERT, "sqrt(")
 def handle_help():
     if sec_status == False:
-        clibox.insert(END, helper)
+        clibox.insert(INSERT, helper)
     elif sec_status == True:
         webbrowser.open(url="http://www.duckduckgo.com/")
         global sec_status
@@ -52,28 +52,31 @@ def second_handler():
     if sec_status == True:
         global sec_status
         sec_status = False
-        print(False)
+        second_button.config(bg="#10186d",fg="#FFFFFF")
     elif sec_status == False:
         global sec_status
         sec_status = True
-        print(True)
+        second_button.config(bg="#fef200",fg="#000000")
 def handle_del():
     if sec_status == False:
         pass
     elif sec_status == True:
         pass
 def y_handler():
-    clibox.insert(END, "Y=")
+    clibox.insert(INSERT, "Y=")
 def graph_handler():
-    clibox.insert(END, "graph(")
+    clibox.insert(INSERT, "graph(")
 def deriv_handler():
-    clibox.insert(END, "gderiv(")
+    clibox.insert(INSERT, "gderiv(")
 def handle_nderiv():
-    clibox.insert(END, "nderiv(")
-
+    clibox.insert(INSERT, "nderiv(")
+def handle_numpad(button):
+    clibox.insert(INSERT,str(button))
+def four_function_handler(button):
+    clibox.insert(INSERT,str(button))
     
 root = Tk()
-root.wm_title("nTERM-Calc")
+root.wm_title("gCalc")
 frame = Frame(root)
 frame.config(bg="#000000")
 clibox = Text(frame)
@@ -116,9 +119,9 @@ cos_button.config(bg="#10186d", fg="#FFFFFF")
 tan_button = Button(frame, text="tan")
 tan_button.grid(row=0, column=8, sticky=N+E+S+W)
 tan_button.config(bg="#10186d", fg="#FFFFFF")
-seven = Button(frame, text=" 7 ")
-eight = Button(frame, text=" 8 ")
-nine = Button(frame, text=" 9 ")
+seven = Button(frame, text=" 7 ", command=lambda:handle_numpad(7))
+eight = Button(frame, text=" 8 ",command=lambda:handle_numpad(8))
+nine = Button(frame, text=" 9 ",command=lambda:handle_numpad(9))
 seven.grid(row=0, column=9, sticky=N+E+S+W)
 eight.grid(row=0, column=10, sticky=N+E+S+W)
 nine.grid(row=0, column=11, sticky=N+E+S+W)
@@ -137,27 +140,27 @@ up_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 down_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 left_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 right_arrow.config(bg="#524741", fg="#FFFFFF", padx=10,pady=10)
-four = Button(frame, text=" 8 ")
-five = Button(frame, text=" 7 ")
-six = Button(frame, text=" 6 ")
+four = Button(frame, text=" 8 ",command=lambda:handle_numpad(4))
+five = Button(frame, text=" 7 ",command=lambda:handle_numpad(5))
+six = Button(frame, text=" 6 ",command=lambda:handle_numpad(6))
 four.grid(row=1, column=9, sticky=N+E+S+W)
 five.grid(row=1, column=10, sticky=N+E+S+W)
 six.grid(row=1, column=11, sticky=N+E+S+W)
 four.config(bg="#0a4a92", fg="#FFFFFF")
 five.config(bg="#0a4a92", fg="#FFFFFF")
 six.config(bg="#0a4a92", fg="#FFFFFF")
-one = Button(frame, text=" 1 ", padx=10)
-two = Button(frame, text=" 2 ", padx=10)
-three = Button(frame, text=" 3 ", padx=10)
+one = Button(frame, text=" 1 ", padx=10,command=lambda:handle_numpad(1))
+two = Button(frame, text=" 2 ", padx=10,command=lambda:handle_numpad(2))
+three = Button(frame, text=" 3 ", padx=10,command=lambda:handle_numpad(3))
 one.grid(row=2, column=9, sticky=N+E+S+W)
 two.grid(row=2, column=10, sticky=N+E+S+W)
 three.grid(row=2, column=11, sticky=N+E+S+W)
 three.config(bg="#0a4a92", fg="#FFFFFF")
 two.config(bg="#0a4a92", fg="#FFFFFF")
 one.config(bg="#0a4a92", fg="#FFFFFF")
-point = Button(frame, text=" . ")
-zero = Button(frame, text=" 0 ")
-negative = Button(frame, text=" (-) ")
+point = Button(frame, text=" . ",command= lambda:handle_numpad("."))
+zero = Button(frame, text=" 0 ",command=lambda:handle_numpad(0))
+negative = Button(frame, text=" (-) ",command=lambda:handle_numpad("-"))
 point.grid(row=3, column=9, sticky=N+E+S+W)
 zero.grid(row=3, column=10, sticky=N+E+S+W)
 negative.grid(row=3, column=11, sticky=N+E+S+W)

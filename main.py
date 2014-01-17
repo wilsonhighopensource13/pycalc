@@ -151,4 +151,4 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
     
-graph("x**2",-10,10,.001,-10,10)
+graph("sin(x)","function",-10,10,.001,-10,10)
