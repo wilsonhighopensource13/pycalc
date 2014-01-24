@@ -12,7 +12,6 @@ let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an
 >>>
 """
 i = 0
-sec_status = False
 
 def plus_handler():
     clibox.insert(INSERT, "+")
@@ -74,21 +73,21 @@ def handle_numpad(button):
     clibox.insert(INSERT,str(button))
 def four_function_handler(button):
     clibox.insert(INSERT,str(button))
-    
+def interpret_input():
+    s = clibox.get(1.0, END)
+    last_cmd = s.rfind(s,">>>")
+    print(last_cmd)
 root = Tk()
+sec_status = False
 root.wm_title("gCalc")
 frame = Frame(root)
 frame.config(bg="#000000")
 clibox = Text(frame)
 clibox.grid(row=0,column=0, rowspan=5, columnspan=5)
-clibox.config(bg="#000000", fg="#FFFFFF")
+clibox.config(bg="#c9c9b6", fg="#000000")
 clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
-clibox.tag_configure("current_line", background="#e9e9e9")
-def highlight(interval=100):
-    clibox.tag_remove("current_line", 1.0, "end")
-    clibox.tag_add("current_line", "insert lineend", "insert lineend+1c")
-    root.after(interval,highlight)
+clibox.mark_gravity("sentinel", LEFT)
 y_equals = Button(frame, text="Y=",command=y_handler)
 y_equals.grid(row=5,column=0, sticky=N+E+S+W)
 y_equals.config(bg="#3cb879",fg="#000000")
@@ -215,7 +214,7 @@ minus_button = Button(frame, text="-", command=minus_handler)
 plus_button = Button(frame, text="+", command=plus_handler)
 division_button = Button(frame, text="/", command=divide_handler)
 multiplication_button = Button(frame, text="*", command=multiply_handler)
-enter_button = Button(frame, text="ENTER\n↵")
+enter_button = Button(frame, text="ENTER\n↵", command=interpret_input)
 equals_button = Button(frame,text="=", command=equals_handler)
 #grid four-function elements
 enter_button.grid(row=4,column=9,columnspan=3,sticky=N+E+S+W)
