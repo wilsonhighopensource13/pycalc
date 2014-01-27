@@ -75,8 +75,9 @@ def four_function_handler(button):
     clibox.insert(INSERT,str(button))
 def interpret_input():
     s = clibox.get(1.0, END)
-    last_cmd = s.rfind(s,">>>")
-    print(last_cmd)
+    last_cmd = s.rfind(">>>")
+    cmd = s[last_cmd+3:]
+                
 root = Tk()
 sec_status = False
 root.wm_title("gCalc")
