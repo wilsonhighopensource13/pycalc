@@ -44,7 +44,7 @@ def find_terms(expression):
         if char == infix_operation_indices:
             infix_location.append(char)
 
-def nDeriv(expression, x, h):
+def nderiv(expression, x, h=0.0001):
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
 :uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
     try:
@@ -67,17 +67,17 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
             try:
-                storage= round(nDeriv(expression, numbers, .0000001,4))
+                storage= round(nderiv(expression, numbers, .0000001,4))
             except:
-                storage = nDeriv(expression, numbers, .0001)
+                storage = nderiv(expression, numbers, .0001)
             table_of_values.append([numbers, storage])
     except:#will run an advanced list-making tool
         x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
         for number in x_val_list:
             try:
-                storage = round(nDeriv(expression, number, .0000001,4))
+                storage = round(nderiv(expression, number, .0000001,4))
             except:
-                storage = nDeriv(expression, number, .0001)
+                storage = nderiv(expression, number, .0001)
             table_of_values.append([number, storage])
     xs = []
     ys = []
@@ -125,6 +125,7 @@ def gderiv(expression, lower_bound, upper_bound, y_lower_lim, y_upper_lim):
 
 def graph(expression,lower_bound, upper_bound, y_lower_lim,y_upper_lim,graph_type="function"):
     delta_x = abs(lower_bound- upper_bound)/1000.0
+    original_expression = expression
     x_values = []
     y_values = []
     if graph_type == "derivative":
@@ -138,9 +139,9 @@ def graph(expression,lower_bound, upper_bound, y_lower_lim,y_upper_lim,graph_typ
     plt.vlines(0, -1000,1000)
     plt.hlines(0, -1000,1000)
     if graph_type == "derivative":
-        function = "(d/dx)%s"%expression
+        function = "(d/dx)%s"%original_expression
     elif graph_type == "function":
-        function = "f(x)=%s"%expression
+        function = "f(x)=%s"%original_expression
     plt.legend(p1,[function])
     plt.show()
     return 0
