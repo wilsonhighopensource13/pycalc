@@ -247,7 +247,9 @@ def interpret_input():
     try:
         out = str(eval("".join([replace_english(cmd),"*1.0"])))
         clibox.insert(END, "\n %s \n>>>"%out)
-    except: pass
+    except:
+        out = str(eval(replace_english(cmd)))
+        clibox.insert(END, "\n %s \n>>>"%out)
     return 0
 
 root = Tk()
