@@ -1,3 +1,164 @@
+#-*- coding: utf-8 -*- 
+import math
+import matplotlib.pyplot as plt
+sec_status = False
+def replace_english(expression):
+    replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
+                          ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"],
+                          ["arccos(","math.acos("],["sqrt(","math.sqrt("]]
+    variable = "x"
+    digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    for replacements in replacement_tables:
+        old = replacements[0]
+        new = replacements[1] 
+        expression = expression.replace(old,new)
+    for i in range(0,len(expression)-1):
+        if (expression[i] in digits) and (expression[i+1] == variable):
+            a, b =(expression[0:i+1],expression[i+1:])
+            expression = ""
+            expression = expression.join([a,"*",b])
+    return expression
+
+def find_terms(expression):
+    log_signs_locations = {}
+    infix_operation_indices = ["+","-","*","**","/"]
+    #prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
+    #postfix_operation_indices = [")"]
+    i = 0
+    indicator = 0
+    while i < len(expression):
+        for indices in infix_operation_indices:
+            if expression[i] == indices:
+                indicator += 1
+                log_signs_locations[indices] = [log_signs_locations[indices]].append(i)
+            
+    return log_signs_locations
+            #if char == infix_operation_indices[0]
+    infix_operation_indices = ["+","-","*","/"] ##items which will separate terms
+    prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
+    postfix_operation_indices = [")"]
+    infix_location = []
+    i = 0
+    while i < len(expression):
+        char = expression[i]
+        if char == infix_operation_indices:
+            infix_location.append(char)
+
+def nderiv(expression, x, h=0.0001):
+    """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
+:uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
+    try:
+        deriv_expression_a = expression.replace("x", "(x+h)")
+        deriv_expression_b = expression.replace("x", "(x-h)")
+        solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2*h)
+        if (expression.find("math.floor") or expression.find("floor")) and solution>0:
+            solution =  None
+        if solution >= 100000000:
+            solution = None
+    except:
+        solution = None
+    return solution
+
+def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
+    #(on the increment delta_x) in domain: [lowerbound,upperbound]
+    expression = replace_english(expression)
+    print (expression)
+    table_of_values = []
+    try: #may fail if either lower_bound, upper_bound, or delta_x are floats
+        for numbers in range(lower_bound,upper_bound+1, delta_x):
+            try:
+                storage= round(nderiv(expression, numbers, .0000001,4))
+            except:
+                storage = nderiv(expression, numbers, .0001)
+            table_of_values.append([numbers, storage])
+    except:#will run an advanced list-making tool
+        x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
+        for number in x_val_list:
+            try:
+                storage = round(nderiv(expression, number, .0000001,4))
+            except:
+                storage = nderiv(expression, number, .0001)
+            table_of_values.append([number, storage])
+    xs = []
+    ys = []
+    for elements in table_of_values:
+        xs.append(elements[0])
+        ys.append(elements[1])
+    return xs, ys
+        
+
+def val_function(expression, x):
+    try:
+        return (eval(expression))
+    except:
+        return None
+
+def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
+    expression = replace_english(expression)
+    print (expression)
+    table_of_values = []
+    xs  = []
+    ys = []
+    try: #may fail if either lower_bound, upper_bound, or delta_x are floats
+        for number in range(lower_bound,upper_bound+1, delta_x):
+            try:
+                storage = round(val_function(expression, number),4)
+            except:
+                storage = val_function(expression, number)
+            table_of_values.append([number, storage])
+    except:#will run an advanced list-making tool
+        x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
+        for number in x_val_list:
+            try:
+                storage = round(val_function(expression,number),4)
+            except:
+                storage = val_function(expression, number)
+            table_of_values.append([number, storage])
+    for elements in table_of_values:
+        xs.append(elements[0])
+        ys.append(elements[1])
+    return xs, ys
+
+def gderiv(expression, lower_bound, upper_bound, y_lower_lim, y_upper_lim):
+    graph(expression,lower_bound, upper_bound, y_lower_lim, y_upper_lim, "derivative")
+    return 0
+
+def graph(expression,lower_bound, upper_bound, y_lower_lim,y_upper_lim,graph_type="function"):
+    delta_x = abs(lower_bound- upper_bound)/1000.0
+    original_expression = expression
+    x_values = []
+    y_values = []
+    if graph_type == "derivative":
+        x_values, y_values = table_deriv_points(expression,lower_bound,upper_bound,delta_x)
+    elif graph_type == "function":
+        x_values, y_values = table_function_points(expression,lower_bound,upper_bound,delta_x)
+    ax = plt.subplot2grid((1,1),(0,0))
+    p1 = plt.plot(x_values, y_values)
+    ax.set_ylim(y_lower_lim,y_upper_lim)
+    ax.set_xlim(lower_bound,upper_bound)
+    plt.vlines(0, -1000,1000)
+    plt.hlines(0, -1000,1000)
+    if graph_type == "derivative":
+        function = "(d/dx)%s"%original_expression
+    elif graph_type == "function":
+        function = "f(x)=%s"%original_expression
+    plt.legend(p1,[function])
+    plt.show()
+    return 0
+    
+        
+def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figuring a table of values for a function
+    i = 0
+    table_of_inputs=[]                                    
+    while i < math.floor((upper_bound - lower_bound)/delta_x):
+        try:
+            intermediate_x = round((lower_bound + i*delta_x), 4)
+        except:
+            intermediate_x = lower_bound + i*delta_x
+        table_of_inputs.append(intermediate_x)
+        i = i+1
+    return table_of_inputs
+
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
 try:
@@ -12,13 +173,7 @@ let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an
 >>>
 """
 i = 0
-<<<<<<< HEAD
-sec_status = True
-def backspace():
-    event.widget.delete("%s-1c" % INSERT, INSERT)
-=======
 
->>>>>>> da6478ddec6f145a17c996707a877fb108975bd9
 def plus_handler():
     clibox.insert(INSERT, "+")
 def issue_command(command):
@@ -39,7 +194,7 @@ def handle_log():
 def handle_exponential():
     if sec_status == False:
         clibox.insert(INSERT, "e^(")
-    elif sec_status == True:
+    if sec_status == True:
         clibox.insert(INSERT, "10^(")
 def handle_power():
     if sec_status == False:
@@ -50,9 +205,6 @@ def handle_help():
     if sec_status == False:
         clibox.insert(INSERT, helper)
     elif sec_status == True:
-<<<<<<< HEAD
-        webbrowser.open(url = "file://C:/Users/2015fulricb/Documents/GitHub/pycalc/documentation.html",new=0)
-=======
         webbrowser.open(url="http://www.duckduckgo.com/")
         global sec_status
         sec_status = False
@@ -86,10 +238,21 @@ def interpret_input():
     s = clibox.get(1.0, END)
     last_cmd = s.rfind(">>>")
     cmd = s[last_cmd+3:]
-                
->>>>>>> da6478ddec6f145a17c996707a877fb108975bd9
+    out = ""
+    #Needs work here when a float is the result
+    try:
+        eval(replace_english(cmd))
+    except:
+        clibox.insert(END, "\nWhoops! An error occurred\n>>>")
+    try:
+        out = str(eval("".join([replace_english(cmd),"*1.0"])))
+        clibox.insert(END, "\n %s \n>>>"%out)
+    except:
+        out = str(eval(replace_english(cmd)))
+        clibox.insert(END, "\n %s \n>>>"%out)
+    return 0
+
 root = Tk()
-sec_status = False
 root.wm_title("gCalc")
 frame = Frame(root)
 frame.config(bg="#000000")
