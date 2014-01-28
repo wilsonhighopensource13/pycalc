@@ -12,7 +12,7 @@ let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an
 >>>
 """
 i = 0
-sec_status = False
+sec_status = True
 def backspace():
     event.widget.delete("%s-1c" % INSERT, INSERT)
 def plus_handler():
@@ -46,7 +46,7 @@ def handle_help():
     if sec_status == False:
         clibox.insert(END, helper)
     elif sec_status == True:
-        webbrowser.open(url="http://www.duckduckgo.com/")
+        webbrowser.open(url = "file://C:/Users/2015fulricb/Documents/GitHub/pycalc/documentation.html",new=0)
 root = Tk()
     
 frame = Frame(root)
