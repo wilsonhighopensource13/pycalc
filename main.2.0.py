@@ -5,7 +5,7 @@ sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
                           ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"],
-                          ["arccos(","math.acos("],["sqrt(","math.sqrt("]]
+                          ["arccos(","math.acos("],["sqrt(","math.sqrt("],["ln","math.ln("],["log(","math.log("]]
     variable = "x"
     digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     for replacements in replacement_tables:
@@ -251,6 +251,8 @@ def interpret_input():
         out = str(eval(replace_english(cmd)))
         clibox.insert(END, "\n %s \n>>>"%out)
     return 0
+def handle_graphs(button):
+    clibox.insert(INSERT,str(button))
 
 root = Tk()
 root.wm_title("gCalc")
@@ -265,16 +267,16 @@ clibox.mark_gravity("sentinel", LEFT)
 y_equals = Button(frame, text="Y=",command=y_handler)
 y_equals.grid(row=5,column=0, sticky=N+E+S+W)
 y_equals.config(bg="#3cb879",fg="#000000")
-graph_button = Button(frame, text="Graph")
+graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
 graph_button.grid(row=5,column=1, sticky=N+E+S+W)
 graph_button.config(bg="#fef200",fg="#000000")
-window_button = Button(frame, text="Window")
+window_button = Button(frame, text="Window",command=lambda:handle_graphs())
 window_button.grid(row=5,column=2, sticky=N+E+S+W)
 window_button.config(bg="#fef200",fg="#000000")
-zoom_button = Button(frame, text="Zoom")
+zoom_button = Button(frame, text="Zoom",command=lambda:handle_graphs())
 zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
 zoom_button.config(bg="#fef200",fg="#000000")
-deriv_button = Button(frame, text="Graph Derivative")
+deriv_button = Button(frame, text="Graph Derivative",command=lambda:handle_graphs("gderiv("))
 deriv_button.grid(row=5, column=4, sticky=N+E+S+W)
 deriv_button.config(bg="#fef200",fg="#000000")
 about_text = Message(frame, text="Graphing Calculator\nPowered by Python 3.3",width=300)
@@ -343,8 +345,8 @@ negative.config(bg="#0a4a92", fg="#FFFFFF")
                 
 #intitalize function pad row 1
 help_button = Button(frame, text="gui-help\nCLI-HELP", command=handle_help)
-function2 = Button(frame, text="(")
-function3 = Button(frame, text=")")
+function2 = Button(frame, text="(", command=lambda:handle_graphs("("))
+function3 = Button(frame, text=")", command=lambda:handle_graphs(")"))
 function4 = Button(frame, text="nDeriv(", command=handle_nderiv)
 #row 2
 logORln_button = Button(frame, text="log\nLN", command=handle_log)
