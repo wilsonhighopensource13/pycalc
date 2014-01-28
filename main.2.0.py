@@ -5,7 +5,7 @@ sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
                           ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"],
-                          ["arccos(","math.acos("],["sqrt(","math.sqrt("],["ln","math.ln("],["log(","math.log("]]
+                          ["arccos(","math.acos("],["sqrt(","math.sqrt("]]
     variable = "x"
     digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     for replacements in replacement_tables:
@@ -19,6 +19,10 @@ def replace_english(expression):
             expression = expression.join([a,"*",b])
     return expression
 
+def ln(n):
+    return math.log(n)
+def log(n,base=10):
+    return math.log(n,base)
 def find_terms(expression):
     log_signs_locations = {}
     infix_operation_indices = ["+","-","*","**","/"]
@@ -189,7 +193,7 @@ def equals_handler():
 def handle_log():
     if sec_status == False:
         clibox.insert(INSERT, "ln(")
-    elif sec_status == True:
+    else:
         clibox.insert(INSERT, "log(")
 def handle_exponential():
     if sec_status == False:
@@ -241,11 +245,11 @@ def interpret_input():
     out = ""
     #Needs work here when a float is the result
     try:
-        eval(replace_english(cmd))
+        print(replace_english(cmd))
     except:
         clibox.insert(END, "\nWhoops! An error occurred\n>>>")
     try:
-        out = str(eval("".join([replace_english(cmd),"*1.0"])))
+        out = str(eval("".join(["(",replace_english(cmd),")*1.0"])))
         clibox.insert(END, "\n %s \n>>>"%out)
     except:
         out = str(eval(replace_english(cmd)))
@@ -253,6 +257,20 @@ def interpret_input():
     return 0
 def handle_graphs(button):
     clibox.insert(INSERT,str(button))
+def handle_arrows(direction):
+    index = str(clibox.index("insert"))
+    placemark = index.find(".")
+    x = index[0:placemark]
+    y = index[placemark+1:]
+    if direction == "up":
+        pass
+        ##text.mark_set("insert", "%d.%d" % (line + 1, column + 1)
+    elif direction == "down":
+        pass
+    elif direction == "left":
+        pass
+    elif direction == "right":
+        pass
 
 root = Tk()
 root.wm_title("gCalc")
@@ -303,7 +321,7 @@ nine.grid(row=0, column=11, sticky=N+E+S+W)
 seven.config(bg="#0a4a92", fg="#FFFFFF")
 eight.config(bg="#0a4a92", fg="#FFFFFF")
 nine.config(bg="#0a4a92", fg="#FFFFFF")
-up_arrow = Button(frame, text="↑")
+up_arrow = Button(frame, text="↑", command=lambda:handle_arrows("up"))
 left_arrow = Button(frame, text="←")
 right_arrow = Button(frame, text="→")
 down_arrow = Button(frame, text="↓")
