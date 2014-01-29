@@ -23,44 +23,24 @@ def ln(n):
     return math.log(n)
 def log(n,base=10):
     return math.log(n,base)
-def find_terms(expression):
-    log_signs_locations = {}
-    infix_operation_indices = ["+","-","*","**","/"]
-    #prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
-    #postfix_operation_indices = [")"]
-    i = 0
-    indicator = 0
-    while i < len(expression):
-        for indices in infix_operation_indices:
-            if expression[i] == indices:
-                indicator += 1
-                log_signs_locations[indices] = [log_signs_locations[indices]].append(i)
-            
-    return log_signs_locations
-            #if char == infix_operation_indices[0]
-    infix_operation_indices = ["+","-","*","/"] ##items which will separate terms
-    prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
-    postfix_operation_indices = [")"]
-    infix_location = []
-    i = 0
-    while i < len(expression):
-        char = expression[i]
-        if char == infix_operation_indices:
-            infix_location.append(char)
 
-def nderiv(expression, x, h=0.0001):
+def nderiv(expression, x, h=0.01, mode="replace"):
+    if mode == "replace":
+        expression = replace_english(expression)
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
 :uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
     try:
         deriv_expression_a = expression.replace("x", "(x+h)")
         deriv_expression_b = expression.replace("x", "(x-h)")
+        print("".join([deriv_expression_a,deriv_expression_b]))
         solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2*h)
+        print(solution)
         if (expression.find("math.floor") or expression.find("floor")) and solution>0:
             solution =  None
-        if solution >= 100000000:
+        elif solution >= 100000000:
             solution = None
     except:
-        solution = None
+        solution = None        
     return solution
 
 def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
@@ -71,17 +51,17 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
     try: #may fail if either lower_bound, upper_bound, or delta_x are floats
         for numbers in range(lower_bound,upper_bound+1, delta_x):
             try:
-                storage= round(nderiv(expression, numbers, .0000001,4))
+                storage= round(nderiv(expression, numbers, .0001, "not"))
             except:
-                storage = nderiv(expression, numbers, .0001)
+                storage = nderiv(expression, numbers, .0001,"not")
             table_of_values.append([numbers, storage])
     except:#will run an advanced list-making tool
         x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
         for number in x_val_list:
             try:
-                storage = round(nderiv(expression, number, .0000001,4))
+                storage = round(nderiv(expression, number, .0000001, "not"))
             except:
-                storage = nderiv(expression, number, .0001)
+                storage = nderiv(expression, number, .0001,"not")
             table_of_values.append([number, storage])
     xs = []
     ys = []
@@ -260,17 +240,18 @@ def handle_graphs(button):
 def handle_arrows(direction):
     index = str(clibox.index("insert"))
     placemark = index.find(".")
-    x = index[0:placemark]
-    y = index[placemark+1:]
+    line = int(index[0:placemark])
+    column = int(index[placemark+1:])
+    print(line,column)
     if direction == "up":
-        pass
-        ##text.mark_set("insert", "%d.%d" % (line + 1, column + 1)
-    elif direction == "down":
-        pass
-    elif direction == "left":
-        pass
-    elif direction == "right":
-        pass
+        clibox.mark_set("insert", "%d.%d" % (line - 1, column))
+    if direction == "down":
+        clibox.mark_set("insert", "%d.%d" % (line + 1, column))
+    if direction == "left":
+        clibox.mark_set("insert", "%d.%d" % (line, column -1))
+    if direction == "right":
+        clibox.mark_set("insert", "%d.%d" % (line, column + 1))
+    return 0
 
 root = Tk()
 root.wm_title("gCalc")
@@ -322,9 +303,9 @@ seven.config(bg="#0a4a92", fg="#FFFFFF")
 eight.config(bg="#0a4a92", fg="#FFFFFF")
 nine.config(bg="#0a4a92", fg="#FFFFFF")
 up_arrow = Button(frame, text="↑", command=lambda:handle_arrows("up"))
-left_arrow = Button(frame, text="←")
-right_arrow = Button(frame, text="→")
-down_arrow = Button(frame, text="↓")
+left_arrow = Button(frame, text="←", command=lambda:handle_arrows("left"))
+right_arrow = Button(frame, text="→",command=lambda:handle_arrows("right"))
+down_arrow = Button(frame, text="↓",command=lambda:handle_arrows("down"))
 up_arrow.grid(row=1, column=6 , columnspan=2)
 left_arrow.grid(row=2, column=5, columnspan=2)
 right_arrow.grid(row=2, column=7, columnspan=2)
@@ -424,6 +405,6 @@ minus_button.config(bg="#524741", fg="#FFFFFF")
 equals_button.config(bg="#524741", fg="#FFFFFF")
 multiplication_button.config(bg="#524741", fg="#FFFFFF")
 division_button.config(bg="#524741", fg="#FFFFFF")
-
+root.bind("<Control-o>",interpret_input)
 frame.pack()
 root.mainloop()
