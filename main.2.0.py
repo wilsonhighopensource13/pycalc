@@ -71,6 +71,28 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
         ys.append(elements[1])
     return xs, ys
         
+def gint(expression, lower_bound, upper_bound, y_lower_lim, y_upper_lim):
+    y_val_list = 0
+    delta_x = (upper_bound - lower_bound)/1000
+    ##use trapezoidal rule to estimate the integral
+    x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
+    for number in x_val_list:
+        x = number
+        try:
+            a = eval(expression)
+            b = eval(expression+delta_x)
+        except:
+            pass
+    y_val_list +=((a*b)/2)*delta_xR
+    ax = plt.subplot2grid((1,1),(0,0))
+    p1 = plt.plot(x_values, y_values)
+    ax.set_ylim(y_lower_lim,y_upper_lim)
+    ax.set_xlim(lower_bound,upper_bound)
+    plt.vlines(0, -1000,1000)
+    plt.hlines(0, -1000,1000)
+    function = "∫%s"%original_expression
+    plt.legend(p1,[function])
+    plt.show()
 
 def val_function(expression, x):
     try:
@@ -207,8 +229,8 @@ def second_handler():
         global sec_status
         sec_status = True
         second_button.config(bg="#fef200",fg="#000000")
-def y_handler():
-    clibox.insert(INSERT, "Y=")
+def integral_handler():
+    clibox.insert(INSERT, "gint(")
 def graph_handler():
     clibox.insert(INSERT, "graph(")
 def deriv_handler():
@@ -233,7 +255,7 @@ def interpret_input():
         out = str(eval("".join(["(",replace_english(cmd),")*1.0"])))
         clibox.insert(END, "\n %s \n>>>"%out)
     except:
-        out = str(eval(replace_english(cmd)))
+        out = eval(replace_english(cmd))
         clibox.insert(END, "\n %s \n>>>"%out)
     return 0
 def handle_graphs(button):
@@ -281,9 +303,9 @@ clibox.config(bg="#c9c9b6", fg="#000000")
 clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
 clibox.mark_gravity("sentinel", LEFT)
-y_equals = Button(frame, text="Y=",command=y_handler)
-y_equals.grid(row=5,column=0, sticky=N+E+S+W)
-y_equals.config(bg="#3cb879",fg="#000000")
+gint = Button(frame, text="Graph Integral",command=integral_handler)
+gint.grid(row=5,column=0, sticky=N+E+S+W)
+gint.config(bg="#fef200",fg="#000000")
 graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
 graph_button.grid(row=5,column=1, sticky=N+E+S+W)
 graph_button.config(bg="#fef200",fg="#000000")
