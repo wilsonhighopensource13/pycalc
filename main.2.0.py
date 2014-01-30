@@ -5,7 +5,8 @@ sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
                           ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"],
-                          ["arccos(","math.acos("],["sqrt(","math.sqrt("]]
+                          ["arccos(","math.acos("],["sqrt(","math.sqrt("],["arccos(","math.acos("],["arcsin(","math.asin"],
+                          ["arctan(","math.atan("]]
     variable = "x"
     digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     for replacements in replacement_tables:
@@ -157,11 +158,12 @@ let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an
 >>>
 """
 i = 0
-
+def sec_back():
+    global sec_status
+    sec_status = False
+    second_button.config(bg="#10186d",fg="#FFFFFF")
 def plus_handler():
     clibox.insert(INSERT, "+")
-def issue_command(command):
-    pass
 def minus_handler():
     clibox.insert(INSERT, "-")
 def multiply_handler():
@@ -175,23 +177,27 @@ def handle_log():
         clibox.insert(INSERT, "ln(")
     else:
         clibox.insert(INSERT, "log(")
+        sec_back()
 def handle_exponential():
     if sec_status == False:
         clibox.insert(INSERT, "e^(")
     if sec_status == True:
         clibox.insert(INSERT, "10^(")
+        sec_back()
 def handle_power():
     if sec_status == False:
         clibox.insert(INSERT, "^")
     if sec_status == True:
         clibox.insert(INSERT, "sqrt(")
+        sec_back()
 def handle_help():
     if sec_status == False:
         clibox.insert(INSERT, helper)
     elif sec_status == True:
-        webbrowser.open(url="http://www.duckduckgo.com/")
-        global sec_status
-        sec_status = False
+        directory = os.path.dirname(os.path.abspath(__file__)) 
+        filename = os.path.join(directory, 'documentation.html')
+        webbrowser.open(url=filename)
+        sec_back()
 def second_handler():
     if sec_status == True:
         global sec_status
@@ -201,11 +207,6 @@ def second_handler():
         global sec_status
         sec_status = True
         second_button.config(bg="#fef200",fg="#000000")
-def handle_del():
-    if sec_status == False:
-        pass
-    elif sec_status == True:
-        pass
 def y_handler():
     clibox.insert(INSERT, "Y=")
 def graph_handler():
@@ -242,7 +243,6 @@ def handle_arrows(direction):
     placemark = index.find(".")
     line = int(index[0:placemark])
     column = int(index[placemark+1:])
-    print(line,column)
     if direction == "up":
         clibox.mark_set("insert", "%d.%d" % (line - 1, column))
     if direction == "down":
@@ -252,7 +252,25 @@ def handle_arrows(direction):
     if direction == "right":
         clibox.mark_set("insert", "%d.%d" % (line, column + 1))
     return 0
-
+def handle_clear():
+    clibox.delete("1.0",END)
+    clibox.insert(END,">>>")
+    return 0
+def handle_back():
+    clibox.delete("%s-1c" % INSERT, INSERT)
+def handle_vars():
+    if sec_status == False:
+        clibox.insert(INSERT,"x")
+    elif sec_status == True:
+        clibox.insert(INSERT,"let")
+        sec_back()
+def handle_trig(s):
+    s += "("
+    if sec_status == False:
+        clibox.insert(INSERT, s)
+    elif sec_status == True:
+        s = "arc" + s
+        clibox.insert(INSERT, s)
 root = Tk()
 root.wm_title("gCalc")
 frame = Frame(root)
@@ -284,13 +302,13 @@ about_text.config(anchor=W, bg="#000000",fg="#FFFFFF")
 second_button = Button(frame, text="2nd", command=second_handler)
 second_button.grid(row=0, column=5, sticky=N+E+S+W)
 second_button.config(bg="#10186d", fg="#FFFFFF")
-sin_button = Button(frame, text="sin")
+sin_button = Button(frame, text="arcsin\nSIN",command=lambda:handle_trig("sin"))
 sin_button.grid(row=0,column=6, sticky=N+E+S+W)
 sin_button.config(bg="#10186d", fg="#FFFFFF")
-cos_button = Button(frame, text="cos")
+cos_button = Button(frame, text="arccos\nCOS",command=lambda:handle_trig("cos"))
 cos_button.grid(row=0, column=7, sticky=N+E+S+W)
 cos_button.config(bg="#10186d", fg="#FFFFFF")
-tan_button = Button(frame, text="tan")
+tan_button = Button(frame, text="arctan\nTAN",command=lambda:handle_trig("tan"))
 tan_button.grid(row=0, column=8, sticky=N+E+S+W)
 tan_button.config(bg="#10186d", fg="#FFFFFF")
 seven = Button(frame, text=" 7 ", command=lambda:handle_numpad(7))
@@ -351,12 +369,12 @@ function4 = Button(frame, text="nDeriv(", command=handle_nderiv)
 logORln_button = Button(frame, text="log\nLN", command=handle_log)
 exponential_button=Button(frame,text="10^x\ne^x", command=handle_exponential)
 power_button=Button(frame,text="sqrt\nX^Y", command=handle_power)
-function5 = Button(frame, text="CLEAR")#, command=clear_line)
+function5 = Button(frame, text="CLEAR", command=handle_clear)
 #row 3
-function6 = Button(frame, text="Ins\nDEL", command=handle_del)
+function6 = Button(frame, text="DEL", command=handle_back)
 program_button = Button(frame, text="PRGM", state=DISABLED)
-x_var_button = Button(frame, text="vars\nX")
-mode_button = Button(frame, text="MODE")
+x_var_button = Button(frame, text="let\nX", command=handle_vars)
+mode_button = Button(frame, text="MODE", state = DISABLED)
 #grid function pad elements
 help_button.grid(row=4, column=5, sticky=N+E+S+W)
 function2.grid(row=4, column=6, sticky=N+E+S+W)
