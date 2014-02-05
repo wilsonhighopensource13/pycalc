@@ -5,8 +5,8 @@ sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
                           ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"],
-                          ["arccos(","math.acos("],["sqrt(","math.sqrt("],["arccos(","math.acos("],["arcsin(","math.asin"],
-                          ["arctan(","math.atan("]]
+                          ["arccos(","math.acos("],["sqrt(","math.sqrt("],["arccos(","math.acos("],["arcsin(","math.asin("],
+                          ["arctan(","math.atan("],["abs(","math.fabs("],["pi","math.pi"]]
     variable = "x"
     digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     for replacements in replacement_tables:
@@ -25,45 +25,30 @@ def ln(n):
 def log(n,base=10):
     return math.log(n,base)
 
-def nderiv(expression, x, h=0.01, mode="replace"):
-    if mode == "replace":
-        expression = replace_english(expression)
+def nderiv(expression, x, h=0.001):
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
 :uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
     try:
         deriv_expression_a = expression.replace("x", "(x+h)")
         deriv_expression_b = expression.replace("x", "(x-h)")
-        print("".join([deriv_expression_a,deriv_expression_b]))
-        solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2*h)
-        print(solution)
-        if (expression.find("math.floor") or expression.find("floor")) and solution>0:
-            solution =  None
-        elif solution >= 100000000:
-            solution = None
+        print(expression)
+        solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2.0*h)
     except:
-        solution = None        
+        solution = None
     return solution
 
 def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
+    print(expression,lower_bound,upper_bound,delta_x)
     #(on the increment delta_x) in domain: [lowerbound,upperbound]
     expression = replace_english(expression)
-    print (expression)
     table_of_values = []
-    try: #may fail if either lower_bound, upper_bound, or delta_x are floats
-        for numbers in range(lower_bound,upper_bound+1, delta_x):
-            try:
-                storage= round(nderiv(expression, numbers, .0001, "not"))
-            except:
-                storage = nderiv(expression, numbers, .0001,"not")
-            table_of_values.append([numbers, storage])
-    except:#will run an advanced list-making tool
-        x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
-        for number in x_val_list:
-            try:
-                storage = round(nderiv(expression, number, .0000001, "not"))
-            except:
-                storage = nderiv(expression, number, .0001,"not")
-            table_of_values.append([number, storage])
+    x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
+    for number in x_val_list:
+        try:
+            storage = round(nderiv(expression, number, .0001))
+        except:
+            storage = nderiv(expression, number, .0001)
+        table_of_values.append([number, storage])
     xs = []
     ys = []
     for elements in table_of_values:
@@ -71,28 +56,20 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
         ys.append(elements[1])
     return xs, ys
         
-def gint(expression, lower_bound, upper_bound, y_lower_lim, y_upper_lim):
-    y_val_list = 0
-    delta_x = (upper_bound - lower_bound)/1000
+def dint(expression, lower_bound, upper_bound):
+    summation = 0
+    delta_x = math.fabs((upper_bound - lower_bound))/100.0
     ##use trapezoidal rule to estimate the integral
     x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
-    for number in x_val_list:
-        x = number
+    for x in x_val_list:
         try:
             a = eval(expression)
             b = eval(expression+delta_x)
+            summation +=((a+b)/2)*delta_x
         except:
-            pass
-    y_val_list +=((a*b)/2)*delta_xR
-    ax = plt.subplot2grid((1,1),(0,0))
-    p1 = plt.plot(x_values, y_values)
-    ax.set_ylim(y_lower_lim,y_upper_lim)
-    ax.set_xlim(lower_bound,upper_bound)
-    plt.vlines(0, -1000,1000)
-    plt.hlines(0, -1000,1000)
-    function = "∫%s"%original_expression
-    plt.legend(p1,[function])
-    plt.show()
+            continue
+    return summation
+    
 
 def val_function(expression, x):
     try:
@@ -102,25 +79,16 @@ def val_function(expression, x):
 
 def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
     expression = replace_english(expression)
-    print (expression)
     table_of_values = []
     xs  = []
     ys = []
-    try: #may fail if either lower_bound, upper_bound, or delta_x are floats
-        for number in range(lower_bound,upper_bound+1, delta_x):
-            try:
-                storage = round(val_function(expression, number),4)
-            except:
-                storage = val_function(expression, number)
-            table_of_values.append([number, storage])
-    except:#will run an advanced list-making tool
-        x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
-        for number in x_val_list:
-            try:
-                storage = round(val_function(expression,number),4)
-            except:
-                storage = val_function(expression, number)
-            table_of_values.append([number, storage])
+    x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
+    for number in x_val_list:
+        try:
+            storage = round(val_function(expression,number),4)
+        except:
+            storage = val_function(expression, number)
+        table_of_values.append([number, storage])
     for elements in table_of_values:
         xs.append(elements[0])
         ys.append(elements[1])
@@ -131,7 +99,7 @@ def gderiv(expression, lower_bound, upper_bound, y_lower_lim, y_upper_lim):
     return 0
 
 def graph(expression,lower_bound, upper_bound, y_lower_lim,y_upper_lim,graph_type="function"):
-    delta_x = abs(lower_bound- upper_bound)/1000.0
+    delta_x = abs(lower_bound - upper_bound)/1000.0
     original_expression = expression
     x_values = []
     y_values = []
@@ -230,7 +198,7 @@ def second_handler():
         sec_status = True
         second_button.config(bg="#fef200",fg="#000000")
 def integral_handler():
-    clibox.insert(INSERT, "gint(")
+    clibox.insert(INSERT, "dint(")
 def graph_handler():
     clibox.insert(INSERT, "graph(")
 def deriv_handler():
@@ -247,16 +215,13 @@ def interpret_input():
     cmd = s[last_cmd+3:]
     out = ""
     #Needs work here when a float is the result
+    cmd = replace_english(cmd)
     try:
-        print(replace_english(cmd))
-    except:
-        clibox.insert(END, "\nWhoops! An error occurred\n>>>")
-    try:
-        out = str(eval("".join(["(",replace_english(cmd),")*1.0"])))
+        out = str(eval("".join(["(",cmd,")*1.0"])))
         clibox.insert(END, "\n %s \n>>>"%out)
     except:
-        out = eval(replace_english(cmd))
-        clibox.insert(END, "\n %s \n>>>"%out)
+        try: eval(cmd)
+        except: clibox.insert(END, "\nWhoops! An error occurred\n>>>")
     return 0
 def handle_graphs(button):
     clibox.insert(INSERT,str(button))
@@ -303,16 +268,16 @@ clibox.config(bg="#c9c9b6", fg="#000000")
 clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
 clibox.mark_gravity("sentinel", LEFT)
-gint = Button(frame, text="Graph Integral",command=integral_handler)
-gint.grid(row=5,column=0, sticky=N+E+S+W)
-gint.config(bg="#fef200",fg="#000000")
+dint = Button(frame, text="Definite Integral",command=integral_handler)
+dint.grid(row=5,column=0, sticky=N+E+S+W)
+dint.config(bg="#fef200",fg="#000000")
 graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
 graph_button.grid(row=5,column=1, sticky=N+E+S+W)
 graph_button.config(bg="#fef200",fg="#000000")
-window_button = Button(frame, text="Window",command=lambda:handle_graphs())
+window_button = Button(frame, text="Window",command=lambda:handle_graphs(), state=DISABLED)
 window_button.grid(row=5,column=2, sticky=N+E+S+W)
 window_button.config(bg="#fef200",fg="#000000")
-zoom_button = Button(frame, text="Zoom",command=lambda:handle_graphs())
+zoom_button = Button(frame, text="Zoom",command=lambda:handle_graphs(), state=DISABLED)
 zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
 zoom_button.config(bg="#fef200",fg="#000000")
 deriv_button = Button(frame, text="Graph Derivative",command=lambda:handle_graphs("gderiv("))
@@ -354,8 +319,8 @@ up_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 down_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 left_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 right_arrow.config(bg="#524741", fg="#FFFFFF", padx=10,pady=10)
-four = Button(frame, text=" 8 ",command=lambda:handle_numpad(4))
-five = Button(frame, text=" 7 ",command=lambda:handle_numpad(5))
+four = Button(frame, text=" 4 ",command=lambda:handle_numpad(4))
+five = Button(frame, text=" 5 ",command=lambda:handle_numpad(5))
 six = Button(frame, text=" 6 ",command=lambda:handle_numpad(6))
 four.grid(row=1, column=9, sticky=N+E+S+W)
 five.grid(row=1, column=10, sticky=N+E+S+W)
