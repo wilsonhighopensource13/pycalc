@@ -25,17 +25,19 @@ def ln(n):
 def log(n,base=10):
     return math.log(n,base)
 
-def nderiv(expression, x, h=0.001):
+def nderiv(expression, x, h=0.001, mode="replace"):
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
 :uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
+    if mode == "replace":
+        expression = replace_english(expression)
     try:
         deriv_expression_a = expression.replace("x", "(x+h)")
         deriv_expression_b = expression.replace("x", "(x-h)")
-        print(expression)
-        solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2.0*h)
+        solution =(eval(deriv_expression_a)-eval(deriv_expression_b))/(2*h)
     except:
         solution = None
     return solution
+
 
 def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
     print(expression,lower_bound,upper_bound,delta_x)
@@ -58,17 +60,20 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
         
 def dint(expression, lower_bound, upper_bound):
     summation = 0
-    delta_x = math.fabs((upper_bound - lower_bound))/100.0
+    delta_x = math.fabs((upper_bound - lower_bound))/1000.0
     ##use trapezoidal rule to estimate the integral
     x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
     for x in x_val_list:
         try:
             a = eval(expression)
-            b = eval(expression+delta_x)
+            x = x+delta_x
+            b = eval(expression)
             summation +=((a+b)/2)*delta_x
         except:
             continue
     return summation
+
+
     
 
 def val_function(expression, x):
@@ -133,6 +138,7 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         table_of_inputs.append(intermediate_x)
         i = i+1
     return table_of_inputs
+print(dint("x**2",0,10))
 
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
@@ -209,7 +215,7 @@ def handle_numpad(button):
     clibox.insert(INSERT,str(button))
 def four_function_handler(button):
     clibox.insert(INSERT,str(button))
-def interpret_input():
+def interpret_input(alpha = None):
     s = clibox.get(1.0, END)
     last_cmd = s.rfind(">>>")
     cmd = s[last_cmd+3:]
@@ -220,8 +226,12 @@ def interpret_input():
         out = str(eval("".join(["(",cmd,")*1.0"])))
         clibox.insert(END, "\n %s \n>>>"%out)
     except:
-        try: eval(cmd)
-        except: clibox.insert(END, "\nWhoops! An error occurred\n>>>")
+        try:
+            eval(cmd)
+            clibox.insert(END, "\n>>>")
+        except:
+            clibox.insert(END, "\nError!\n>>>")
+    
     return 0
 def handle_graphs(button):
     clibox.insert(INSERT,str(button))
@@ -246,11 +256,14 @@ def handle_clear():
 def handle_back():
     clibox.delete("%s-1c" % INSERT, INSERT)
 def handle_vars():
+    clibox.insert(INSERT,"x")
+    """
     if sec_status == False:
         clibox.insert(INSERT,"x")
     elif sec_status == True:
         clibox.insert(INSERT,"let")
         sec_back()
+    """
 def handle_trig(s):
     s += "("
     if sec_status == False:
@@ -269,19 +282,19 @@ clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
 clibox.mark_gravity("sentinel", LEFT)
 dint = Button(frame, text="Definite Integral",command=integral_handler)
-dint.grid(row=5,column=0, sticky=N+E+S+W)
+dint.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
 dint.config(bg="#fef200",fg="#000000")
 graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
-graph_button.grid(row=5,column=1, sticky=N+E+S+W)
+graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 2)
 graph_button.config(bg="#fef200",fg="#000000")
-window_button = Button(frame, text="Window",command=lambda:handle_graphs(), state=DISABLED)
-window_button.grid(row=5,column=2, sticky=N+E+S+W)
-window_button.config(bg="#fef200",fg="#000000")
-zoom_button = Button(frame, text="Zoom",command=lambda:handle_graphs(), state=DISABLED)
-zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
-zoom_button.config(bg="#fef200",fg="#000000")
+#window_button = Button(frame, text="Window",command=lambda:handle_graphs(), state=DISABLED)
+#window_button.grid(row=5,column=2, sticky=N+E+S+W)
+#window_button.config(bg="#fef200",fg="#000000")
+#zoom_button = Button(frame, text="Zoom",command=lambda:handle_graphs(), state=DISABLED)
+#zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
+#zoom_button.config(bg="#fef200",fg="#000000")
 deriv_button = Button(frame, text="Graph Derivative",command=lambda:handle_graphs("gderiv("))
-deriv_button.grid(row=5, column=4, sticky=N+E+S+W)
+deriv_button.grid(row=5, column=3, sticky=N+E+S+W, columnspan=2)
 deriv_button.config(bg="#fef200",fg="#000000")
 about_text = Message(frame, text="Graphing Calculator\nPowered by Python 3.3",width=300)
 about_text.grid(row=6, column=0, columnspan=5, sticky=N+E+S+W)
@@ -360,7 +373,7 @@ function5 = Button(frame, text="CLEAR", command=handle_clear)
 #row 3
 function6 = Button(frame, text="DEL", command=handle_back)
 program_button = Button(frame, text="PRGM", state=DISABLED)
-x_var_button = Button(frame, text="let\nX", command=handle_vars)
+x_var_button = Button(frame, text="X", command=handle_vars)
 mode_button = Button(frame, text="MODE", state = DISABLED)
 #grid function pad elements
 help_button.grid(row=4, column=5, sticky=N+E+S+W)
@@ -395,7 +408,7 @@ plus_button = Button(frame, text="+", command=plus_handler)
 division_button = Button(frame, text="/", command=divide_handler)
 multiplication_button = Button(frame, text="*", command=multiply_handler)
 enter_button = Button(frame, text="ENTER\n↵", command=interpret_input)
-equals_button = Button(frame,text="=", command=equals_handler)
+equals_button = Button(frame,text="",state=DISABLED)
 #grid four-function elements
 enter_button.grid(row=4,column=9,columnspan=3,sticky=N+E+S+W)
 plus_button.grid(row=5,column=9,sticky=N+E+S+W)
