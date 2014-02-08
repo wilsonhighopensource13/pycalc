@@ -36,7 +36,6 @@ def nderiv(expression, x, h=0.001, mode="replace"):
         solution =(eval(deriv_expression_a)-eval(deriv_expression_b))/(2*h)
     except:
         solution = None
-    print
     return solution
 
 
@@ -54,10 +53,9 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
     return xs, ys
 
         
-def dint(expression, lower_bound, upper_bound, delta_x = 0):
+def dint(expression, lower_bound, upper_bound):
     summation = 0
-    if delta_x == 0:
-        delta_x = math.fabs(upper_bound - lower_bound)/1000.0
+    delta_x = math.fabs(upper_bound-lower_bound)/1000.0
     ##use trapezoidal rule to estimate the integral
     x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
     for x in x_val_list:
@@ -135,7 +133,7 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         table_of_inputs.append(intermediate_x)
         i = i+1
     return table_of_inputs
-
+print()
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
 try:
@@ -145,12 +143,13 @@ except:
 import webbrowser, os
 helper = """\n
 <required parameter>, [unrequired parameter]
-nderiv("expression",<point>,[accuracy])
+nderiv(\"expression\",<point>,[accuracy])
 dint(\"expression\",<left-bound>,<right-bound>,<delta_x>)\t uses the trapezoidal approximation
 gderiv(\"<expression\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 graph(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 >>>
 """
+
 i = 0
 def sec_back():
     global sec_status
@@ -216,13 +215,12 @@ def handle_numpad(button):
     clibox.insert(INSERT,str(button))
 def four_function_handler(button):
     clibox.insert(INSERT,str(button))
-def interpret_input(alpha = None):
+def interpret_input():
     s = clibox.get(1.0, END)
     last_cmd = s.rfind(">>>")
-    cmd = s[last_cmd+3:]
+    com = s[last_cmd+3:]
     out = ""
-    #Needs work here when a float is the result
-    cmd = replace_english(cmd)
+    cmd = replace_english(com)
     if cmd.find("graph") >= 0:
         clibox.insert(END,"\n>>>")
     elif cmd.find("gderiv") >= 0:
@@ -232,12 +230,13 @@ def interpret_input(alpha = None):
         clibox.insert(END, "\n%s"%out)
     except:
         try:
-            eval(cmd)
+            out = eval(cmd)
+            clibox.insert(END, "\n%s"%out)
         except:
             pass
+            eval(com)
     finally:
         clibox.insert(END, "\n>>>")
-    
     return 0
 def handle_graphs(button):
     clibox.insert(INSERT,str(button))
@@ -277,7 +276,8 @@ def handle_trig(s):
     elif sec_status == True:
         s = "arc" + s
         clibox.insert(INSERT, s)
-        clibox.insert(INSERT, helper)
+        sec_back()
+        
 root = Tk()
 root.wm_title("pyCalc")
 frame = Frame(root)
@@ -288,9 +288,9 @@ clibox.config(bg="#c9c9b6", fg="#000000")
 clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
 clibox.mark_gravity("sentinel", LEFT)
-dint = Button(frame, text="Definite Integral",command=integral_handler)
-dint.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
-dint.config(bg="#fef200",fg="#000000")
+dintegral = Button(frame, text="Definite Integral",command=integral_handler)
+dintegral.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
+dintegral.config(bg="#fef200",fg="#000000",state=NORMAL)
 graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
 graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 2)
 graph_button.config(bg="#fef200",fg="#000000")
