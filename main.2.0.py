@@ -36,31 +36,28 @@ def nderiv(expression, x, h=0.001, mode="replace"):
         solution =(eval(deriv_expression_a)-eval(deriv_expression_b))/(2*h)
     except:
         solution = None
+    print
     return solution
 
 
 def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
-    print(expression,lower_bound,upper_bound,delta_x)
     #(on the increment delta_x) in domain: [lowerbound,upperbound]
     expression = replace_english(expression)
-    table_of_values = []
-    x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
-    for number in x_val_list:
-        try:
-            storage = round(nderiv(expression, number, .0001))
-        except:
-            storage = nderiv(expression, number, .0001)
-        table_of_values.append([number, storage])
-    xs = []
+    xs = advanced_range_tool(lower_bound,upper_bound,delta_x)
     ys = []
-    for elements in table_of_values:
-        xs.append(elements[0])
-        ys.append(elements[1])
+    for number in xs:
+        try:
+            storage = round(nderiv(expression, number, .0001,""),4)
+        except:
+            storage = nderiv(expression, number, .0001, "")
+        ys.append(storage)
     return xs, ys
+
         
-def dint(expression, lower_bound, upper_bound):
+def dint(expression, lower_bound, upper_bound, delta_x = 0):
     summation = 0
-    delta_x = math.fabs((upper_bound - lower_bound))/1000.0
+    if delta_x == 0:
+        delta_x = math.fabs(upper_bound - lower_bound)/1000.0
     ##use trapezoidal rule to estimate the integral
     x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
     for x in x_val_list:
@@ -138,7 +135,6 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         table_of_inputs.append(intermediate_x)
         i = i+1
     return table_of_inputs
-print(dint("x**2",0,10))
 
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
@@ -148,9 +144,11 @@ except:
     from Tkinter import *
 import webbrowser, os
 helper = """\n
-graph_deriv(y=<algebraic expression>)\t graphs the derivative of the function
-graph(y=<algebraic expression>)\t graphs the function
-let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an\n\t expression
+<required parameter>, [unrequired parameter]
+nderiv("expression",<point>,[accuracy])
+dint(\"expression\",<left-bound>,<right-bound>,<delta_x>)\t uses the trapezoidal approximation
+gderiv(\"<expression\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
+graph(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 >>>
 """
 i = 0
@@ -187,6 +185,8 @@ def handle_power():
         clibox.insert(INSERT, "sqrt(")
         sec_back()
 def handle_help():
+    clibox.insert(INSERT, helper)
+    """
     if sec_status == False:
         clibox.insert(INSERT, helper)
     elif sec_status == True:
@@ -194,6 +194,7 @@ def handle_help():
         filename = os.path.join(directory, 'documentation.html')
         webbrowser.open(url=filename)
         sec_back()
+    """
 def second_handler():
     if sec_status == True:
         global sec_status
@@ -222,15 +223,20 @@ def interpret_input(alpha = None):
     out = ""
     #Needs work here when a float is the result
     cmd = replace_english(cmd)
+    if cmd.find("graph") >= 0:
+        clibox.insert(END,"\n>>>")
+    elif cmd.find("gderiv") >= 0:
+        clibox.insert(END,"\n>>>")
     try:
         out = str(eval("".join(["(",cmd,")*1.0"])))
-        clibox.insert(END, "\n %s \n>>>"%out)
+        clibox.insert(END, "\n%s"%out)
     except:
         try:
             eval(cmd)
-            clibox.insert(END, "\n>>>")
         except:
-            clibox.insert(END, "\nError!\n>>>")
+            pass
+    finally:
+        clibox.insert(END, "\n>>>")
     
     return 0
 def handle_graphs(button):
@@ -271,8 +277,9 @@ def handle_trig(s):
     elif sec_status == True:
         s = "arc" + s
         clibox.insert(INSERT, s)
+        clibox.insert(INSERT, helper)
 root = Tk()
-root.wm_title("gCalc")
+root.wm_title("pyCalc")
 frame = Frame(root)
 frame.config(bg="#000000")
 clibox = Text(frame)
@@ -361,7 +368,7 @@ zero.config(bg="#0a4a92", fg="#FFFFFF")
 negative.config(bg="#0a4a92", fg="#FFFFFF")
                 
 #intitalize function pad row 1
-help_button = Button(frame, text="gui-help\nCLI-HELP", command=handle_help)
+help_button = Button(frame, text="HELP", command=handle_help)
 function2 = Button(frame, text="(", command=lambda:handle_graphs("("))
 function3 = Button(frame, text=")", command=lambda:handle_graphs(")"))
 function4 = Button(frame, text="nDeriv(", command=handle_nderiv)
