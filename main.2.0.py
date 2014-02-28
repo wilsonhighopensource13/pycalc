@@ -1,6 +1,10 @@
 #-*- coding: utf-8 -*- 
+"""
+Just an idea: nested matplotlib 
+"""
 import math
 import matplotlib.pyplot as plt
+import sympy
 sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
@@ -133,7 +137,11 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         table_of_inputs.append(intermediate_x)
         i = i+1
     return table_of_inputs
-print()
+
+#you might want this to directly output via a textbox or something
+def latex_out(s):
+    text = sympy.latex( expr, mode='inline' )
+    return text
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
 try:

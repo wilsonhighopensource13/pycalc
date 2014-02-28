@@ -5,7 +5,8 @@ sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
                           ["cot(","math.cot("],["sec(","math.sec("],["csc(","math.csc("],["[[","math.floor("],["]]",")"],
-                          ["arccos(","math.acos("],["sqrt(","math.sqrt("]]
+                          ["arccos(","math.acos("],["sqrt(","math.sqrt("],["arccos(","math.acos("],["arcsin(","math.asin("],
+                          ["arctan(","math.atan("],["abs(","math.fabs("],["pi","math.pi"]]
     variable = "x"
     digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     for replacements in replacement_tables:
@@ -19,73 +20,56 @@ def replace_english(expression):
             expression = expression.join([a,"*",b])
     return expression
 
-def find_terms(expression):
-    log_signs_locations = {}
-    infix_operation_indices = ["+","-","*","**","/"]
-    #prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
-    #postfix_operation_indices = [")"]
-    i = 0
-    indicator = 0
-    while i < len(expression):
-        for indices in infix_operation_indices:
-            if expression[i] == indices:
-                indicator += 1
-                log_signs_locations[indices] = [log_signs_locations[indices]].append(i)
-            
-    return log_signs_locations
-            #if char == infix_operation_indices[0]
-    infix_operation_indices = ["+","-","*","/"] ##items which will separate terms
-    prefix_operation_indices = ["math.sin(","math.cos(","(","math.tan(","math.cot(","math.sec(","math.csc(","log("]
-    postfix_operation_indices = [")"]
-    infix_location = []
-    i = 0
-    while i < len(expression):
-        char = expression[i]
-        if char == infix_operation_indices:
-            infix_location.append(char)
+def ln(n):
+    return math.log(n)
+def log(n,base=10):
+    return math.log(n,base)
 
-def nDeriv(expression, x, h):
+def nderiv(expression, x, h=0.001, mode="replace"):
     """:finds the numerical derivative at a certain point, n, while h is the accuracy of the derivative calc, the lower the better
 :uses f'(n)= (f(x+h) - f(x-h))/(2h)"""
+    if mode == "replace":
+        expression = replace_english(expression)
     try:
         deriv_expression_a = expression.replace("x", "(x+h)")
         deriv_expression_b = expression.replace("x", "(x-h)")
-        solution =((eval(deriv_expression_a))-(eval(deriv_expression_b)))/(2*h)
-        if (expression.find("math.floor") or expression.find("floor")) and solution>0:
-            solution =  None
-        if solution >= 100000000:
-            solution = None
+        solution =(eval(deriv_expression_a)-eval(deriv_expression_b))/(2*h)
     except:
         solution = None
     return solution
 
+
 def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds all of the values of a function's derivatives
     #(on the increment delta_x) in domain: [lowerbound,upperbound]
     expression = replace_english(expression)
-    print (expression)
-    table_of_values = []
-    try: #may fail if either lower_bound, upper_bound, or delta_x are floats
-        for numbers in range(lower_bound,upper_bound+1, delta_x):
-            try:
-                storage= round(nDeriv(expression, numbers, .0000001,4))
-            except:
-                storage = nDeriv(expression, numbers, .0001)
-            table_of_values.append([numbers, storage])
-    except:#will run an advanced list-making tool
-        x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
-        for number in x_val_list:
-            try:
-                storage = round(nDeriv(expression, number, .0000001,4))
-            except:
-                storage = nDeriv(expression, number, .0001)
-            table_of_values.append([number, storage])
-    xs = []
+    xs = advanced_range_tool(lower_bound,upper_bound,delta_x)
     ys = []
-    for elements in table_of_values:
-        xs.append(elements[0])
-        ys.append(elements[1])
+    for number in xs:
+        try:
+            storage = round(nderiv(expression, number, .0001,""),4)
+        except:
+            storage = nderiv(expression, number, .0001, "")
+        ys.append(storage)
     return xs, ys
+
         
+def dint(expression, lower_bound, upper_bound):
+    summation = 0
+    delta_x = math.fabs(upper_bound-lower_bound)/1000.0
+    ##use trapezoidal rule to estimate the integral
+    x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
+    for x in x_val_list:
+        try:
+            a = eval(expression)
+            x = x+delta_x
+            b = eval(expression)
+            summation +=((a+b)/2)*delta_x
+        except:
+            continue
+    return summation
+
+
+    
 
 def val_function(expression, x):
     try:
@@ -95,25 +79,16 @@ def val_function(expression, x):
 
 def table_function_points(expression, lower_bound, upper_bound, delta_x): ##requires more work
     expression = replace_english(expression)
-    print (expression)
     table_of_values = []
     xs  = []
     ys = []
-    try: #may fail if either lower_bound, upper_bound, or delta_x are floats
-        for number in range(lower_bound,upper_bound+1, delta_x):
-            try:
-                storage = round(val_function(expression, number),4)
-            except:
-                storage = val_function(expression, number)
-            table_of_values.append([number, storage])
-    except:#will run an advanced list-making tool
-        x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
-        for number in x_val_list:
-            try:
-                storage = round(val_function(expression,number),4)
-            except:
-                storage = val_function(expression, number)
-            table_of_values.append([number, storage])
+    x_val_list = advanced_range_tool(lower_bound,upper_bound,delta_x)
+    for number in x_val_list:
+        try:
+            storage = round(val_function(expression,number),4)
+        except:
+            storage = val_function(expression, number)
+        table_of_values.append([number, storage])
     for elements in table_of_values:
         xs.append(elements[0])
         ys.append(elements[1])
@@ -124,7 +99,8 @@ def gderiv(expression, lower_bound, upper_bound, y_lower_lim, y_upper_lim):
     return 0
 
 def graph(expression,lower_bound, upper_bound, y_lower_lim,y_upper_lim,graph_type="function"):
-    delta_x = abs(lower_bound- upper_bound)/1000.0
+    delta_x = abs(lower_bound - upper_bound)/1000.0
+    original_expression = expression
     x_values = []
     y_values = []
     if graph_type == "derivative":
@@ -138,9 +114,9 @@ def graph(expression,lower_bound, upper_bound, y_lower_lim,y_upper_lim,graph_typ
     plt.vlines(0, -1000,1000)
     plt.hlines(0, -1000,1000)
     if graph_type == "derivative":
-        function = "(d/dx)%s"%expression
+        function = "(d/dx)%s"%original_expression
     elif graph_type == "function":
-        function = "f(x)=%s"%expression
+        function = "f(x)=%s"%original_expression
     plt.legend(p1,[function])
     plt.show()
     return 0
@@ -157,7 +133,7 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         table_of_inputs.append(intermediate_x)
         i = i+1
     return table_of_inputs
-
+print()
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
 try:
@@ -166,17 +142,21 @@ except:
     from Tkinter import *
 import webbrowser, os
 helper = """\n
-graph_deriv(y=<algebraic expression>)\t graphs the derivative of the function
-graph(y=<algebraic expression>)\t graphs the function
-let <a,b,c...A,B,C... except(y,Y or x,X)> = <expression>\t sets a variable to an\n\t expression
+<required parameter>, [unrequired parameter]
+nderiv(\"expression\",<point>,[accuracy])
+dint(\"expression\",<left-bound>,<right-bound>,<delta_x>)\t uses the trapezoidal approximation
+gderiv(\"<expression\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
+graph(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 >>>
 """
-i = 0
 
+i = 0
+def sec_back():
+    global sec_status
+    sec_status = False
+    second_button.config(bg="#10186d",fg="#FFFFFF")
 def plus_handler():
     clibox.insert(INSERT, "+")
-def issue_command(command):
-    pass
 def minus_handler():
     clibox.insert(INSERT, "-")
 def multiply_handler():
@@ -188,25 +168,32 @@ def equals_handler():
 def handle_log():
     if sec_status == False:
         clibox.insert(INSERT, "ln(")
-    elif sec_status == True:
+    else:
         clibox.insert(INSERT, "log(")
+        sec_back()
 def handle_exponential():
     if sec_status == False:
         clibox.insert(INSERT, "e^(")
     if sec_status == True:
         clibox.insert(INSERT, "10^(")
+        sec_back()
 def handle_power():
     if sec_status == False:
         clibox.insert(INSERT, "^")
     if sec_status == True:
         clibox.insert(INSERT, "sqrt(")
+        sec_back()
 def handle_help():
+    clibox.insert(INSERT, helper)
+    """
     if sec_status == False:
         clibox.insert(INSERT, helper)
     elif sec_status == True:
-        webbrowser.open(url="http://www.duckduckgo.com/")
-        global sec_status
-        sec_status = False
+        directory = os.path.dirname(os.path.abspath(__file__)) 
+        filename = os.path.join(directory, 'documentation.html')
+        webbrowser.open(url=filename)
+        sec_back()
+    """
 def second_handler():
     if sec_status == True:
         global sec_status
@@ -216,13 +203,8 @@ def second_handler():
         global sec_status
         sec_status = True
         second_button.config(bg="#fef200",fg="#000000")
-def handle_del():
-    if sec_status == False:
-        pass
-    elif sec_status == True:
-        pass
-def y_handler():
-    clibox.insert(INSERT, "Y=")
+def integral_handler():
+    clibox.insert(INSERT, "dint(")
 def graph_handler():
     clibox.insert(INSERT, "graph(")
 def deriv_handler():
@@ -236,20 +218,68 @@ def four_function_handler(button):
 def interpret_input():
     s = clibox.get(1.0, END)
     last_cmd = s.rfind(">>>")
-    cmd = s[last_cmd+3:]
+    com = s[last_cmd+3:]
     out = ""
+    cmd = replace_english(com)
+    if cmd.find("graph") >= 0:
+        clibox.insert(END,"\n>>>")
+    elif cmd.find("gderiv") >= 0:
+        clibox.insert(END,"\n>>>")
     try:
-        eval(replace_english(cmd))
+        out = str(eval("".join(["(",cmd,")*1.0"])))
+        clibox.insert(END, "\n%s"%out)
     except:
-        clibox.insert(END, "\nWhoops! An error occurred\n>>>")
-    try:
-        out = str(eval("".join([replace_english(cmd),"*1.0"])))
-        clibox.insert(END, "\n %s \n>>>"%out)
-    except: pass
+        try:
+            out = eval(cmd)
+            clibox.insert(END, "\n%s"%out)
+        except:
+            pass
+            eval(com)
+    finally:
+        clibox.insert(END, "\n>>>")
     return 0
-
+def handle_graphs(button):
+    clibox.insert(INSERT,str(button))
+def handle_arrows(direction):
+    index = str(clibox.index("insert"))
+    placemark = index.find(".")
+    line = int(index[0:placemark])
+    column = int(index[placemark+1:])
+    if direction == "up":
+        clibox.mark_set("insert", "%d.%d" % (line - 1, column))
+    if direction == "down":
+        clibox.mark_set("insert", "%d.%d" % (line + 1, column))
+    if direction == "left":
+        clibox.mark_set("insert", "%d.%d" % (line, column -1))
+    if direction == "right":
+        clibox.mark_set("insert", "%d.%d" % (line, column + 1))
+    return 0
+def handle_clear():
+    clibox.delete("1.0",END)
+    clibox.insert(END,">>>")
+    return 0
+def handle_back():
+    clibox.delete("%s-1c" % INSERT, INSERT)
+def handle_vars():
+    clibox.insert(INSERT,"x")
+    """
+    if sec_status == False:
+        clibox.insert(INSERT,"x")
+    elif sec_status == True:
+        clibox.insert(INSERT,"let")
+        sec_back()
+    """
+def handle_trig(s):
+    s += "("
+    if sec_status == False:
+        clibox.insert(INSERT, s)
+    elif sec_status == True:
+        s = "arc" + s
+        clibox.insert(INSERT, s)
+        sec_back()
+        
 root = Tk()
-root.wm_title("gCalc")
+root.wm_title("pyCalc")
 frame = Frame(root)
 frame.config(bg="#000000")
 clibox = Text(frame)
@@ -258,20 +288,20 @@ clibox.config(bg="#c9c9b6", fg="#000000")
 clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
 clibox.mark_gravity("sentinel", LEFT)
-y_equals = Button(frame, text="Y=",command=y_handler)
-y_equals.grid(row=5,column=0, sticky=N+E+S+W)
-y_equals.config(bg="#3cb879",fg="#000000")
-graph_button = Button(frame, text="Graph")
-graph_button.grid(row=5,column=1, sticky=N+E+S+W)
+dintegral = Button(frame, text="Definite Integral",command=integral_handler)
+dintegral.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
+dintegral.config(bg="#fef200",fg="#000000",state=NORMAL)
+graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
+graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 2)
 graph_button.config(bg="#fef200",fg="#000000")
-window_button = Button(frame, text="Window")
-window_button.grid(row=5,column=2, sticky=N+E+S+W)
-window_button.config(bg="#fef200",fg="#000000")
-zoom_button = Button(frame, text="Zoom")
-zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
-zoom_button.config(bg="#fef200",fg="#000000")
-deriv_button = Button(frame, text="Graph Derivative")
-deriv_button.grid(row=5, column=4, sticky=N+E+S+W)
+#window_button = Button(frame, text="Window",command=lambda:handle_graphs(), state=DISABLED)
+#window_button.grid(row=5,column=2, sticky=N+E+S+W)
+#window_button.config(bg="#fef200",fg="#000000")
+#zoom_button = Button(frame, text="Zoom",command=lambda:handle_graphs(), state=DISABLED)
+#zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
+#zoom_button.config(bg="#fef200",fg="#000000")
+deriv_button = Button(frame, text="Graph Derivative",command=lambda:handle_graphs("gderiv("))
+deriv_button.grid(row=5, column=3, sticky=N+E+S+W, columnspan=2)
 deriv_button.config(bg="#fef200",fg="#000000")
 about_text = Message(frame, text="Graphing Calculator\nPowered by Python 3.3",width=300)
 about_text.grid(row=6, column=0, columnspan=5, sticky=N+E+S+W)
@@ -279,13 +309,13 @@ about_text.config(anchor=W, bg="#000000",fg="#FFFFFF")
 second_button = Button(frame, text="2nd", command=second_handler)
 second_button.grid(row=0, column=5, sticky=N+E+S+W)
 second_button.config(bg="#10186d", fg="#FFFFFF")
-sin_button = Button(frame, text="sin")
+sin_button = Button(frame, text="arcsin\nSIN",command=lambda:handle_trig("sin"))
 sin_button.grid(row=0,column=6, sticky=N+E+S+W)
 sin_button.config(bg="#10186d", fg="#FFFFFF")
-cos_button = Button(frame, text="cos")
+cos_button = Button(frame, text="arccos\nCOS",command=lambda:handle_trig("cos"))
 cos_button.grid(row=0, column=7, sticky=N+E+S+W)
 cos_button.config(bg="#10186d", fg="#FFFFFF")
-tan_button = Button(frame, text="tan")
+tan_button = Button(frame, text="arctan\nTAN",command=lambda:handle_trig("tan"))
 tan_button.grid(row=0, column=8, sticky=N+E+S+W)
 tan_button.config(bg="#10186d", fg="#FFFFFF")
 seven = Button(frame, text=" 7 ", command=lambda:handle_numpad(7))
@@ -297,10 +327,10 @@ nine.grid(row=0, column=11, sticky=N+E+S+W)
 seven.config(bg="#0a4a92", fg="#FFFFFF")
 eight.config(bg="#0a4a92", fg="#FFFFFF")
 nine.config(bg="#0a4a92", fg="#FFFFFF")
-up_arrow = Button(frame, text="↑")
-left_arrow = Button(frame, text="←")
-right_arrow = Button(frame, text="→")
-down_arrow = Button(frame, text="↓")
+up_arrow = Button(frame, text="↑", command=lambda:handle_arrows("up"))
+left_arrow = Button(frame, text="←", command=lambda:handle_arrows("left"))
+right_arrow = Button(frame, text="→",command=lambda:handle_arrows("right"))
+down_arrow = Button(frame, text="↓",command=lambda:handle_arrows("down"))
 up_arrow.grid(row=1, column=6 , columnspan=2)
 left_arrow.grid(row=2, column=5, columnspan=2)
 right_arrow.grid(row=2, column=7, columnspan=2)
@@ -309,8 +339,8 @@ up_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 down_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 left_arrow.config(bg="#524741", fg="#FFFFFF",padx=10,pady=10)
 right_arrow.config(bg="#524741", fg="#FFFFFF", padx=10,pady=10)
-four = Button(frame, text=" 8 ",command=lambda:handle_numpad(4))
-five = Button(frame, text=" 7 ",command=lambda:handle_numpad(5))
+four = Button(frame, text=" 4 ",command=lambda:handle_numpad(4))
+five = Button(frame, text=" 5 ",command=lambda:handle_numpad(5))
 six = Button(frame, text=" 6 ",command=lambda:handle_numpad(6))
 four.grid(row=1, column=9, sticky=N+E+S+W)
 five.grid(row=1, column=10, sticky=N+E+S+W)
@@ -338,20 +368,20 @@ zero.config(bg="#0a4a92", fg="#FFFFFF")
 negative.config(bg="#0a4a92", fg="#FFFFFF")
                 
 #intitalize function pad row 1
-help_button = Button(frame, text="gui-help\nCLI-HELP", command=handle_help)
-function2 = Button(frame, text="(")
-function3 = Button(frame, text=")")
+help_button = Button(frame, text="HELP", command=handle_help)
+function2 = Button(frame, text="(", command=lambda:handle_graphs("("))
+function3 = Button(frame, text=")", command=lambda:handle_graphs(")"))
 function4 = Button(frame, text="nDeriv(", command=handle_nderiv)
 #row 2
 logORln_button = Button(frame, text="log\nLN", command=handle_log)
 exponential_button=Button(frame,text="10^x\ne^x", command=handle_exponential)
 power_button=Button(frame,text="sqrt\nX^Y", command=handle_power)
-function5 = Button(frame, text="CLEAR")#, command=clear_line)
+function5 = Button(frame, text="CLEAR", command=handle_clear)
 #row 3
-function6 = Button(frame, text="Ins\nDEL", command=handle_del)
+function6 = Button(frame, text="DEL", command=handle_back)
 program_button = Button(frame, text="PRGM", state=DISABLED)
-x_var_button = Button(frame, text="vars\nX")
-mode_button = Button(frame, text="MODE")
+x_var_button = Button(frame, text="X", command=handle_vars)
+mode_button = Button(frame, text="MODE", state = DISABLED)
 #grid function pad elements
 help_button.grid(row=4, column=5, sticky=N+E+S+W)
 function2.grid(row=4, column=6, sticky=N+E+S+W)
@@ -385,7 +415,7 @@ plus_button = Button(frame, text="+", command=plus_handler)
 division_button = Button(frame, text="/", command=divide_handler)
 multiplication_button = Button(frame, text="*", command=multiply_handler)
 enter_button = Button(frame, text="ENTER\n↵", command=interpret_input)
-equals_button = Button(frame,text="=", command=equals_handler)
+equals_button = Button(frame,text="",state=DISABLED)
 #grid four-function elements
 enter_button.grid(row=4,column=9,columnspan=3,sticky=N+E+S+W)
 plus_button.grid(row=5,column=9,sticky=N+E+S+W)
@@ -400,6 +430,6 @@ minus_button.config(bg="#524741", fg="#FFFFFF")
 equals_button.config(bg="#524741", fg="#FFFFFF")
 multiplication_button.config(bg="#524741", fg="#FFFFFF")
 division_button.config(bg="#524741", fg="#FFFFFF")
-
+root.bind("<Control-o>",interpret_input)
 frame.pack()
 root.mainloop()
