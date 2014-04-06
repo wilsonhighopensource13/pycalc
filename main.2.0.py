@@ -56,6 +56,11 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
         ys.append(storage)
     return xs, ys
 
+def cderiv(expression, variable):
+    return sympy.diff(expression, variable)
+
+def iint(expression, variable):
+    return sympy.integrate(expression, variable)
         
 def dint(expression, lower_bound, upper_bound):
     summation = 0
@@ -290,10 +295,6 @@ root = Tk()
 root.wm_title("pyCalc")
 frame = Frame(root)
 frame.config(bg="#000000")
-menubar = tkinter.menu()
-fileMenu = tkinter.menu(menubar, tearoff=False)
-menubar.add_cascade(label="File",underline=0, menu=fileMenu)
-fileMenu.add_command(label="Exit", underline=1)
 clibox = Text(frame)
 clibox.grid(row=0,column=0, rowspan=5, columnspan=5)
 clibox.config(bg="#c9c9b6", fg="#000000")
@@ -304,7 +305,7 @@ dintegral = Button(frame, text="Definite Integral",command=integral_handler)
 dintegral.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
 dintegral.config(bg="#fef200",fg="#000000",state=NORMAL)
 graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
-graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 2)
+graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 1)
 graph_button.config(bg="#fef200",fg="#000000")
 #window_button = Button(frame, text="Window",command=lambda:handle_graphs(), state=DISABLED)
 #window_button.grid(row=5,column=2, sticky=N+E+S+W)
@@ -313,8 +314,14 @@ graph_button.config(bg="#fef200",fg="#000000")
 #zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
 #zoom_button.config(bg="#fef200",fg="#000000")
 deriv_button = Button(frame, text="Graph Derivative",command=lambda:handle_graphs("gderiv("))
-deriv_button.grid(row=5, column=3, sticky=N+E+S+W, columnspan=2)
+deriv_button.grid(row=5, column=2, sticky=N+E+S+W, columnspan=1)
 deriv_button.config(bg="#fef200",fg="#000000")
+cderiv_button = Button(frame, text="Differentiate", command=lambda:handle_graphs("cderiv("))
+cderiv_button.grid(row=5, column=3, sticky=N+E+S+W, columnspan=1)
+cderiv_button.config(bg="#fef200",fg="#000000")
+indef_button = Button(frame, text="Integrate", command=lambda:handle_graphs("iint("))
+indef_button.grid(row=5, column=4, sticky=N+E+S+W, columnspan=1)
+indef_button.config(bg="#fef200",fg="#000000")
 about_text = Message(frame, text="Graphing Calculator\nPowered by Python 3.3",width=300)
 about_text.grid(row=6, column=0, columnspan=5, sticky=N+E+S+W)
 about_text.config(anchor=W, bg="#000000",fg="#FFFFFF")
