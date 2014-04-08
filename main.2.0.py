@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*- 
 """
 Just an idea: nested matplotlib 
+Use TopLevel to make an interpreter
 """
 import math
 import matplotlib.pyplot as plt
