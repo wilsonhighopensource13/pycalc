@@ -54,10 +54,10 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
     return xs, ys
 
         
-def dint(expression, lower_bound, upper_bound, delta_x = 0):
+def dint(expression, lower_bound, upper_bound):
     summation = 0
-    if delta_x == 0:
-        delta_x = math.fabs(upper_bound - lower_bound)/1000.0
+    
+    delta_x = math.fabs(upper_bound - lower_bound)/1000.0
     ##use trapezoidal rule to estimate the integral
     x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
     for x in x_val_list:
@@ -145,9 +145,9 @@ except:
 import webbrowser, os
 helper = """\n
 <required parameter>, [unrequired parameter]
-nderiv("expression",<point>,[accuracy])
-dint(\"expression\",<left-bound>,<right-bound>,<delta_x>)\t uses the trapezoidal approximation
-gderiv(\"<expression\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
+nderiv(\"<expression>\",<point>,[accuracy])
+dint(\"<expression>\",<left-bound>,<right-bound>)\t uses the trapezoidal approximation
+gderiv(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 graph(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 >>>
 """
@@ -225,19 +225,22 @@ def interpret_input(alpha = None):
     cmd = replace_english(cmd)
     if cmd.find("graph") >= 0:
         clibox.insert(END,"\n>>>")
+        eval(cmd)
+        return 0
     elif cmd.find("gderiv") >= 0:
         clibox.insert(END,"\n>>>")
+        eval(cmd)
+        return 0
     try:
         out = str(eval("".join(["(",cmd,")*1.0"])))
         clibox.insert(END, "\n%s"%out)
     except:
         try:
-            eval(cmd)
+            clibox.insert(eval(cmd))
         except:
             pass
     finally:
         clibox.insert(END, "\n>>>")
-    
     return 0
 def handle_graphs(button):
     clibox.insert(INSERT,str(button))
