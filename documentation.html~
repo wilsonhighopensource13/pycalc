@@ -1,32 +1,78 @@
 <html>
 <head>
-<style type="text/css">
-dd{
+<style type="text/css">#whole{margin:5% 5% 5% 5%;}dd{
 	font-weight:bold;	
+}
+a{
+color:black;
 }
 </style>
 </head>
-<body>
+<body><div id="whole">
 <h1>PyCalc: Your Desktop Calculator</h1>
 <h2>Table of Contents</h2>
 <ul style="list-style:none;">
 <li><a href="#overview">Overview</a></li>
-<li><a href="#FAQ">Frequently Asked Questions</a></li>
+<li><a href="#research">Research</a></li>
+<li><a href="#problem">Problem and Solution</a></li>
+<li><a href="#teamwork">Teamwork</a></li>
+<li><a href="">Work Log</a></li>
 </ul>
 <h2 id="overview">Overview</h2>
 <p>PyCalc is your graphing calculator solution for a number of applications, including:</p>
 <ul>
-<li><strong>the classroom</strong>, where the the calculator can be projected on the screen, with graphing both functions and their derivatives. A suite of scientific functions is included.</li>
+<li><strong>the classroom</strong>, where the the calculator can be projected on the screen, with graphing both functions and their derivatives.</li>
 <li><strong>the office</strong>, where the desktop designed, beautiful, and easy-to-used user interface makes the dreary bore of the cubicle farm a little more bright</li>
-<li><strong>at home,</strong>, where even little Johnny can easily use the four functions of the calculator, while doing bills, you can use the scientific functions</li>
+<li><strong>at home</strong>, where even little Johnny can easily use the four functions of the calculator; when balancing budgets, you can do the same.</li>
 </ul>
-<h2 id="#FAQ">FAQs</h2>
-<dl>
-<dd>I clicked on a command and it did not appear. What happened?</dd>
-<dt>More likely than not, your command box was already filled up with old commands and output. Scroll down with the scrollbar to the right. If you find any bugs, please contact <a href="mailto:2015fulricb@share.wilsonsd.org">2015fulricb@share.wilsonsd.org</a>.</dt>
-<dd>There are some commands and functions I want but aren't there.</dd>
-<dt>Click the "Help" button to enable </dt>
-</dl>
-<p></p>
-</body>
+
+<p>With this in mind, the PyCalc team developed a graphing calculator with a simple, easy-to-use GUI with both mouse and keyboard functionality. It utilizes functions not included in the TI-83, TI-84, HP-50 series of mainstream graphing calculators, such as the derivative and definite integral functions. Its highlighted sections of functions(displayed below) makes it easy for a kindergartener to know what buttons to push, while a college students can use it to do more advanced functions.</p>
+
+</p>
+<h2 id="research">Research</h2>
+<p>Several members of our group are in high-level mathematics classes like AP Calculus. We saw that teachers were still using old-age technology, such as an overhead projector and TI-84 graphing calculator display. The PyCalc device is well positioned to ride the wave of technology-in-the-classroom to computers and projectors in schools across the nation. It is both powerful enough for complex mathematical applications, and simple enough for children to use.</p>
+<p>When beginning to code our application, we first looked at a number of GUI modules for python. Tkinter proved to be the optimal solution. Not only is it the "official" GUI of Python, it is cross-platform and easy-to-use for code beginners, while being extensible enough for experienced users.</p>
+<p>As a group, we often used StackOverflow.com to solve any debugging or code concept issues. When, for example, buttons would fail to function properly when clicked. After looking at StackOverflow.com, we found that the runtime errors that had occurred were easily corrected with one line of code.</p>
+
+<p>Tutorials, such as the matplotlib website, served an important role in guiding our code to the finish. Effbot's tkinter tutorial was particularly effective. It provided succinct documentation as well as elaboration on making code more maintainable and readable. Matplotlib's website also provided very much help. Its tutorial displayed dozens of useful examples, which showed by example how to implement our graphing capabilities.</p>
+<p>As we continued development, we asked our teachers to request further features in the PyCalc. They asked for a BASIC interpreter as well as improved calculus functions, like finding the integral and derivative of a function. For BASIC, we found the first version of BASIC, Darmouth BASIC, which is now in the public domain, then reverse engineered an interpreter from the source code. Our BASIC interpreter is continuing to move forward, adding more functionality as it becomes better integrated with the software.</p>
+<h2 id="problem">Problem &amp; Solution</h2>
+<h3>The Problem: There is no universal calculator which can be used by anyone in high school and the workplace.</h3>
+<p><span style="font-weight:bold;font-size:14pt;">The Solution:</span></p>
+<p>The PyCalc is lightweight enough to be used on seemingly-ancient computer software as well as flexible enough to work well on modern architectures. Due to this fact, our calculator works 
+on most modern operating systems, allowing the user to do math without solving dependencies. The package comes as an executable file, which installs all of the dependencies.</p>
+<p>For the less tech-savvy, the design is simple, much like the Metro UI on Windows 8, colorful, and yet so simple. All of your favorite functions are visible on the screen, without crowded menus and text-based options. The input is simple; users input their commands into a screen reminiscent of a calculator, while the screen's design looks like a modern computer application. All of the advanced math functions are present, from Calculus to Trigonometry to Algebra.</p>
+<p>On the other hand, the BASIC interpreter provides flexibility and power. Although currently limited to only a few algebraic and trigonometric functions, the interpreter gives the end user enough power to write scripts to solve their math problems, and later distribute them to students or colleagues.</p>
+<h2 id="teamwork">Teamwork</h2>
+<p>We broke the work up into the following categories:</p>
+<ul>
+<li>Graphical user interface(GUI) design</li>
+<ul>
+<li>We designed the user interface using Photoshop(see below)</li>
+<li>Then, we built the UI using the Tkinter module</li>
+<li>Using its grid method, we were able to give the buttons and other interface elements their clean look</li>
+</ul>
+<li>Backend and Data Structure Design</li>
+<ul>
+<li>We developed the math functions separately from the GUI</li>
+<li>The replace_english subroutine, for example, takes an input expresssion to be converted to a python-evaluatable expression</li>
+<li>The dint (definite integral) subroutine uses trapezoidal approximation to measure the area under a curve</li>
+<li>The gderiv function calls the table_deriv_points subroutine which calls nderiv which approximates 1000s of derivative points. It then graphs these points.</li>
+<li>Utilizing procedure-based programming in Python, we were able to find the derivative or anti-derivative of a function.</li>
+<li>This work required an intimate knowledge of algorithms and mathematics</li>
+</ul>
+<li>Infrastructure between GUI and backend</li>
+<ul>
+<li>The most error-prone of all of the tasks, this required expert knowledge of Tkinter and mathematics</li>
+<li>Button handlers, as well as scrolling functions were designed in this stage.</li>
+<li>Thanks to the use of encapsulation during the backend construction,</li>
+</ul>
+<li>Documentation and assorted paperwork</li>
+<ul>
+<li>One team member was the go-to for software documentation.</li>
+<li>Our programmers collaborated closely with him to elaborate the concepts used in our calculator.</li>
+</ul>
+</ul>
+
+</div></body>
 </html>

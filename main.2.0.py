@@ -1,6 +1,11 @@
 #-*- coding: utf-8 -*- 
+"""
+Just an idea: nested matplotlib 
+Use TopLevel to make an interpreter
+"""
 import math
 import matplotlib.pyplot as plt
+import sympy
 sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
@@ -36,7 +41,6 @@ def nderiv(expression, x, h=0.001, mode="replace"):
         solution =(eval(deriv_expression_a)-eval(deriv_expression_b))/(2*h)
     except:
         solution = None
-    print
     return solution
 
 
@@ -53,11 +57,15 @@ def table_deriv_points(expression, lower_bound, upper_bound, delta_x): ##finds a
         ys.append(storage)
     return xs, ys
 
+def cderiv(expression, variable):
+    return sympy.diff(expression, variable)
+
+def iint(expression, variable):
+    return sympy.integrate(expression, variable)
         
 def dint(expression, lower_bound, upper_bound):
     summation = 0
-    
-    delta_x = math.fabs(upper_bound - lower_bound)/1000.0
+    delta_x = math.fabs(upper_bound-lower_bound)/1000.0
     ##use trapezoidal rule to estimate the integral
     x_val_list = advanced_range_tool(lower_bound, upper_bound, delta_x)
     for x in x_val_list:
@@ -136,6 +144,10 @@ def advanced_range_tool(lower_bound,upper_bound,delta_x): ##will assist in figur
         i = i+1
     return table_of_inputs
 
+#you might want this to directly output via a textbox or something
+def latex_out(s):
+    text = sympy.latex( expr, mode='inline' )
+    return text
 #The GUI work is contained here.
 # -*- coding: UTF-8-*-
 try:
@@ -145,12 +157,19 @@ except:
 import webbrowser, os
 helper = """\n
 <required parameter>, [unrequired parameter]
+<<<<<<< HEAD
 nderiv(\"<expression>\",<point>,[accuracy])
 dint(\"<expression>\",<left-bound>,<right-bound>)\t uses the trapezoidal approximation
 gderiv(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
+=======
+nderiv(\"expression\",<point>,[accuracy])
+dint(\"expression\",<left-bound>,<right-bound>,<delta_x>)\t uses the trapezoidal approximation
+gderiv(\"<expression\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
+>>>>>>> 79171dfa5f6eb81d14adbaf0d611670ba8ec6381
 graph(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 >>>
 """
+
 i = 0
 def sec_back():
     global sec_status
@@ -216,13 +235,12 @@ def handle_numpad(button):
     clibox.insert(INSERT,str(button))
 def four_function_handler(button):
     clibox.insert(INSERT,str(button))
-def interpret_input(alpha = None):
+def interpret_input():
     s = clibox.get(1.0, END)
     last_cmd = s.rfind(">>>")
-    cmd = s[last_cmd+3:]
+    com = s[last_cmd+3:]
     out = ""
-    #Needs work here when a float is the result
-    cmd = replace_english(cmd)
+    cmd = replace_english(com)
     if cmd.find("graph") >= 0:
         clibox.insert(END,"\n>>>")
         eval(cmd)
@@ -238,7 +256,7 @@ def interpret_input(alpha = None):
         try:
             clibox.insert(eval(cmd))
         except:
-            pass
+            eval(com)
     finally:
         clibox.insert(END, "\n>>>")
     return 0
@@ -280,7 +298,8 @@ def handle_trig(s):
     elif sec_status == True:
         s = "arc" + s
         clibox.insert(INSERT, s)
-        clibox.insert(INSERT, helper)
+        sec_back()
+        
 root = Tk()
 root.wm_title("pyCalc")
 frame = Frame(root)
@@ -291,11 +310,11 @@ clibox.config(bg="#c9c9b6", fg="#000000")
 clibox.insert(END, ">>>")
 clibox.mark_set("sentinel", INSERT)
 clibox.mark_gravity("sentinel", LEFT)
-dint = Button(frame, text="Definite Integral",command=integral_handler)
-dint.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
-dint.config(bg="#fef200",fg="#000000")
+dintegral = Button(frame, text="Definite Integral",command=integral_handler)
+dintegral.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
+dintegral.config(bg="#fef200",fg="#000000",state=NORMAL)
 graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
-graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 2)
+graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 1)
 graph_button.config(bg="#fef200",fg="#000000")
 #window_button = Button(frame, text="Window",command=lambda:handle_graphs(), state=DISABLED)
 #window_button.grid(row=5,column=2, sticky=N+E+S+W)
@@ -304,8 +323,14 @@ graph_button.config(bg="#fef200",fg="#000000")
 #zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
 #zoom_button.config(bg="#fef200",fg="#000000")
 deriv_button = Button(frame, text="Graph Derivative",command=lambda:handle_graphs("gderiv("))
-deriv_button.grid(row=5, column=3, sticky=N+E+S+W, columnspan=2)
+deriv_button.grid(row=5, column=2, sticky=N+E+S+W, columnspan=1)
 deriv_button.config(bg="#fef200",fg="#000000")
+cderiv_button = Button(frame, text="Differentiate", command=lambda:handle_graphs("cderiv("))
+cderiv_button.grid(row=5, column=3, sticky=N+E+S+W, columnspan=1)
+cderiv_button.config(bg="#fef200",fg="#000000")
+indef_button = Button(frame, text="Integrate", command=lambda:handle_graphs("iint("))
+indef_button.grid(row=5, column=4, sticky=N+E+S+W, columnspan=1)
+indef_button.config(bg="#fef200",fg="#000000")
 about_text = Message(frame, text="Graphing Calculator\nPowered by Python 3.3",width=300)
 about_text.grid(row=6, column=0, columnspan=5, sticky=N+E+S+W)
 about_text.config(anchor=W, bg="#000000",fg="#FFFFFF")
