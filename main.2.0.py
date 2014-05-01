@@ -78,9 +78,6 @@ def dint(expression, lower_bound, upper_bound):
             continue
     return summation
 
-
-    
-
 def val_function(expression, x):
     try:
         return (eval(expression))
@@ -155,17 +152,12 @@ try:
 except:
     from Tkinter import *
 import webbrowser, os
+
 helper = """\n
 <required parameter>, [unrequired parameter]
-<<<<<<< HEAD
 nderiv(\"<expression>\",<point>,[accuracy])
 dint(\"<expression>\",<left-bound>,<right-bound>)\t uses the trapezoidal approximation
 gderiv(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
-=======
-nderiv(\"expression\",<point>,[accuracy])
-dint(\"expression\",<left-bound>,<right-bound>,<delta_x>)\t uses the trapezoidal approximation
-gderiv(\"<expression\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
->>>>>>> 79171dfa5f6eb81d14adbaf0d611670ba8ec6381
 graph(\"<expression>\",<left-bound>,<right-bound>,<screen_max_y>,<screen_min_y>)
 >>>
 """
@@ -175,34 +167,43 @@ def sec_back():
     global sec_status
     sec_status = False
     second_button.config(bg="#10186d",fg="#FFFFFF")
+    
 def plus_handler():
     clibox.insert(INSERT, "+")
+    
 def minus_handler():
     clibox.insert(INSERT, "-")
+    
 def multiply_handler():
     clibox.insert(INSERT, "*")
+    
 def divide_handler():
     clibox.insert(INSERT, "/")
+    
 def equals_handler():
     clibox.insert(INSERT, "=")
+    
 def handle_log():
     if sec_status == False:
         clibox.insert(INSERT, "ln(")
     else:
         clibox.insert(INSERT, "log(")
         sec_back()
+        
 def handle_exponential():
     if sec_status == False:
         clibox.insert(INSERT, "e^(")
     if sec_status == True:
         clibox.insert(INSERT, "10^(")
         sec_back()
+        
 def handle_power():
     if sec_status == False:
         clibox.insert(INSERT, "^")
     if sec_status == True:
         clibox.insert(INSERT, "sqrt(")
         sec_back()
+
 def handle_help():
     clibox.insert(INSERT, helper)
     """
@@ -214,6 +215,7 @@ def handle_help():
         webbrowser.open(url=filename)
         sec_back()
     """
+    
 def second_handler():
     if sec_status == True:
         global sec_status
@@ -225,16 +227,53 @@ def second_handler():
         second_button.config(bg="#fef200",fg="#000000")
 def integral_handler():
     clibox.insert(INSERT, "dint(")
+    
 def graph_handler():
     clibox.insert(INSERT, "graph(")
+    
 def deriv_handler():
     clibox.insert(INSERT, "gderiv(")
+    
+def init_formula():
+    editor = Toplevel()
+    editor.title("Formula Editor")
+    def open_formula():
+        fformula_name = filesavebox(msg=None, title=None, default='', filetypes=None)
+        fformula = open(fformula_name, "rt")
+        i = 0
+        variables = {}
+        for line in fformula:
+            if i == 0:
+                formula = line
+            else:
+                variables[line[0]] = line[line.find('=')+1:]
+            i += 1
+        return
+    def exec_formula():
+        return
+    def save_formula():
+        return
+    open_button = Button(editor, text="Open", command=open_formula)
+    new_button = Button(editor, text="Exec", command=exec_formula)
+    save_button = Button(editor, text="Save", command=save_formula)
+    #grid these
+    open_button.grid(row=0,column=0)
+    new_button.grid(row=0, column=1)
+    save_button.grid(row=0, column=2)
+    
 def handle_nderiv():
-    clibox.insert(INSERT, "nderiv(")
+    if sec_status == False:
+        clibox.insert(INSERT, "nderiv(")
+    elif sec_status == True:
+        init_formula()
+        sec_back()
+
 def handle_numpad(button):
     clibox.insert(INSERT,str(button))
+    
 def four_function_handler(button):
     clibox.insert(INSERT,str(button))
+    
 def interpret_input():
     s = clibox.get(1.0, END)
     last_cmd = s.rfind(">>>")
@@ -262,6 +301,7 @@ def interpret_input():
     return 0
 def handle_graphs(button):
     clibox.insert(INSERT,str(button))
+    
 def handle_arrows(direction):
     index = str(clibox.index("insert"))
     placemark = index.find(".")
@@ -276,12 +316,15 @@ def handle_arrows(direction):
     if direction == "right":
         clibox.mark_set("insert", "%d.%d" % (line, column + 1))
     return 0
+    
 def handle_clear():
     clibox.delete("1.0",END)
     clibox.insert(END,">>>")
     return 0
+    
 def handle_back():
     clibox.delete("%s-1c" % INSERT, INSERT)
+    
 def handle_vars():
     clibox.insert(INSERT,"x")
     """
@@ -291,6 +334,7 @@ def handle_vars():
         clibox.insert(INSERT,"let")
         sec_back()
     """
+    
 def handle_trig(s):
     s += "("
     if sec_status == False:
@@ -299,7 +343,8 @@ def handle_trig(s):
         s = "arc" + s
         clibox.insert(INSERT, s)
         sec_back()
-        
+
+    
 root = Tk()
 root.wm_title("pyCalc")
 frame = Frame(root)
@@ -312,16 +357,10 @@ clibox.mark_set("sentinel", INSERT)
 clibox.mark_gravity("sentinel", LEFT)
 dintegral = Button(frame, text="Definite Integral",command=integral_handler)
 dintegral.grid(row=5,column=0, sticky=N+E+S+W, columnspan = 1)
-dintegral.config(bg="#fef200",fg="#000000",state=NORMAL)
+dintegral.config(bg="#fef200",fg="#000000", state=NORMAL)
 graph_button = Button(frame, text="Graph",command=lambda:handle_graphs("graph("))
 graph_button.grid(row=5,column=1, sticky=N+E+S+W, columnspan = 1)
 graph_button.config(bg="#fef200",fg="#000000")
-#window_button = Button(frame, text="Window",command=lambda:handle_graphs(), state=DISABLED)
-#window_button.grid(row=5,column=2, sticky=N+E+S+W)
-#window_button.config(bg="#fef200",fg="#000000")
-#zoom_button = Button(frame, text="Zoom",command=lambda:handle_graphs(), state=DISABLED)
-#zoom_button.grid(row=5, column=3, sticky=N+E+S+W)
-#zoom_button.config(bg="#fef200",fg="#000000")
 deriv_button = Button(frame, text="Graph Derivative",command=lambda:handle_graphs("gderiv("))
 deriv_button.grid(row=5, column=2, sticky=N+E+S+W, columnspan=1)
 deriv_button.config(bg="#fef200",fg="#000000")
@@ -444,6 +483,7 @@ division_button = Button(frame, text="/", command=divide_handler)
 multiplication_button = Button(frame, text="*", command=multiply_handler)
 enter_button = Button(frame, text="ENTER\n↵", command=interpret_input)
 equals_button = Button(frame,text="",state=DISABLED)
+
 #grid four-function elements
 enter_button.grid(row=4,column=9,columnspan=3,sticky=N+E+S+W)
 plus_button.grid(row=5,column=9,sticky=N+E+S+W)
@@ -451,6 +491,7 @@ minus_button.grid(row=6,column=9,sticky=N+E+S+W)
 equals_button.grid(row=5,column=11,sticky=N+E+S+W,rowspan=2)
 multiplication_button.grid(row=5,column=10,sticky=N+E+S+W)
 division_button.grid(row=6,column=10,sticky=N+E+S+W)
+
 #configure four-function elements
 enter_button.config(bg="#524741", fg="#FFFFFF")
 plus_button.config(bg="#524741", fg="#FFFFFF")
@@ -458,6 +499,7 @@ minus_button.config(bg="#524741", fg="#FFFFFF")
 equals_button.config(bg="#524741", fg="#FFFFFF")
 multiplication_button.config(bg="#524741", fg="#FFFFFF")
 division_button.config(bg="#524741", fg="#FFFFFF")
-root.bind("<Control-o>",interpret_input)
+
 frame.pack()
+
 root.mainloop()
