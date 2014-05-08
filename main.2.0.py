@@ -5,7 +5,7 @@ Use TopLevel to make an interpreter
 """
 import math
 import matplotlib.pyplot as plt
-import sympy
+import sympy, easygui
 sec_status = False
 def replace_english(expression):
     replacement_tables = [["^","**"],["sin(","math.sin("],["cos(","math.cos("],["tan(","math.tan("],
@@ -238,16 +238,19 @@ def init_formula():
     editor = Toplevel()
     editor.title("Formula Editor")
     def open_formula():
-        fformula_name = filesavebox(msg=None, title=None, default='', filetypes=None)
+        fformula_name = easygui.filesavebox(msg=None, title=None, default='', filetypes=None)
         fformula = open(fformula_name, "rt")
         i = 0
-        variables = {}
+        formulas = {}
         for line in fformula:
-            if i == 0:
+            if "=" in line:
                 formula = line
+                formulas[formula] = []
             else:
-                variables[line[0]] = line[line.find('=')+1:]
-            i += 1
+                delim = line.find(":")
+                var = line[0:delim]
+                description = line[delim:]
+                formulas[formula].append([var,description])
         return
     def exec_formula():
         return
